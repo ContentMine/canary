@@ -1,0 +1,238 @@
+
+<head>
+    <meta charset="utf-8">
+    <title>ContentMine Canary</title>
+    <meta name="description" content="">
+    <meta name="author" content="Cottage Labs">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link href="favicon.ico" rel="icon" type="image/x-icon">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Special+Elite' rel='stylesheet' type='text/css'>
+                
+</head>
+
+
+<template name="canary">
+    
+    <div class="container-fluid">
+        <div class="container" style="background:url(/CM.png);background-repeat:no-repeat;background-position:top right;padding-top:73px;margin-top:10px;">
+            <div class="row">
+                <div class="col-md-12">
+                    {{> sharejsText docid=canarysetid id="urls"}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{#unless urlscount}}    
+    <div class="container-fluid">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12" style="margin-top:5px;">
+                    <p>
+                        Welcome to ContentMine Canary. Type or paste a url above (or one URL per line) then hit enter. 
+                        <!--Or <a href="#" id="byfile">upload a file</a> or select <a href="#" id="bycat">from the catalogue</a>.-->
+                        <br>You can share and collaborate interactively on this working set!
+                        <br>Just share the page URL with your collaborators.
+                        <br>(If you want a nicer URL, then go direct to your preferred URL before starting your work. :)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{else}}
+    <div class="container-fluid">
+        <div class="container">
+            <div class="row" style="margin-top:10px;margin-bottom:10px;">
+                <div class="col-md-6" style="font-size:0.8em;">
+                    <div class="cm">
+                        <p style="color:black;">Type or paste new URLs above. View results below.</p>
+                        {{#each currentset.urls}}
+                            <p style="padding-bottom:0px;margin-bottom:3px;border-bottom:1px solid #ccc;"><span style="color:black;">{{url}}</span>
+                            {{#if results}}
+                                
+                                {{#if results.quickscrape}}
+                                    {{#if results.quickscrape.processing}}
+                                        <br>Processing with quickscrape
+                                    {{else}}
+                                        <br>Processed by quickscrape. Files available:
+                                        {{#each results.quickscrape.files}}
+                                        <br><a href="{{this}}">{{this}}</a>
+                                        {{/each}}
+                                    {{/if}}
+                                {{/if}}
+                                
+                                {{#if results.retrieve}}
+                                    {{#if results.quickscrape.processing}}
+                                        <br>retrieving the file directly
+                                    {{else}}
+                                        <br>File retrieved directly:
+                                        <br><a href="{{results.retrieve.retrieved}}">{{results.retrieve.retrieved}}</a>
+                                        {{#if results.retrieve.unpdf}}
+                                        <br>and PDF dumped to text:
+                                        <br><a href="{{results.retrieve.unpdf}}">{{results.retrieve.unpdf}}</a>
+                                        {{/if}}
+                                    {{/if}}
+                                {{/if}}
+                                
+                                {{#if results.norma}}
+                                    {{#if results.norma.processing}}
+                                        <br>Processing with norma
+                                    {{else}}
+                                        {{#if results.norma.shtml}}
+                                            {{#if results.norma.transposed}}
+                                            <br>Norma failed but raw html copied to continue:
+                                            {{else}}
+                                            <br>Normalised file:
+                                            {{/if}}
+                                            <a href="{{results.norma.shtml}}">{{results.norma.shtml}}</a>
+                                        {{else}}
+                                            <br>Norma failed :(
+                                        {{/if}}
+                                    {{/if}}
+                                {{/if}}
+
+                                {{#if results.regex}}
+                                    {{#if results.regex.processing}}
+                                        <br>Processing with regex
+                                    {{else}}
+                                        {{#if results.regex.factcount}}
+                                        <br>Retrieved {{results.regex.factcount}} facts!
+                                        {{else}}
+                                        <br>Retrieved no facts...
+                                        {{/if}}
+                                    {{/if}}
+                                {{/if}}
+
+                            {{else}}
+                                No results for this URL yet.
+                            {{/if}}
+                            </p>
+                        {{/each}}
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div id="processpanel">
+                        <div class="jumbotron" style="padding-top:10px;padding-bottom:10px;">
+                            <p>
+                                <span style="font-size:5em;">{{factcount}}</span> facts from 
+                                <!--<span style="font-size:2em;">{{factdoccount}}</span> of -->
+                                <span style="font-size:2em;">{{urlscount}}</span> documents.
+                                {{#if factcount }}
+                                <br>Browse the facts below
+                                {{else}}
+                                <br>Try running some processes to extract facts
+                                {{/if}}
+                            </p>
+                        </div>
+                        <div class="well">
+                            <h4>Regex <small>match regular expressions</small></h4>
+                            <p><select id="regextype" class="form-control">
+                                <option value="">choose a prepared regex type</option>
+                                <option>agriculture</option>
+                                <option>astrophysics</option>
+                                <option>ebola</option>
+                                <option>figures</option>
+                                <option>genbank</option>
+                                <option>metadata</option>
+                                <option>pdb</option>
+                                <option>phylotree</option>
+                            </select></p>
+                            <p><input type="text" id="regexurl" class="form-control" placeholder="Or enter a URL to your regex text file"></p>
+                            <a class="btn btn-info btn-block process" id="regex" href="#">Run regex</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/unless}}
+        
+    {{#if factcount}}
+    <div class="container-fluid" style="border-bottom:2px solid #ccc;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    {{#each factlist}}
+                    <div class="col-md-3">
+                        <div class="well" style="padding:5px;height:280px;overflow:hidden;border-color:#187c83;border-width:3px;background-color:#fff;color:#92ce73;">
+                            <p style="font-size:0.9em;">{{pre}}</p>
+                            <p style="color:#187c83;font-weight:bold;font-size:1.6em;">{{fact}}</p>
+                            <p style="font-size:0.9em;">{{post}}</p>
+                            <p style="font-size:0.6em;color:black;">{{processor}}<br>{{url}}</p>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}    
+
+
+    
+    <div class="container-fluid" style="margin-top:20px;">
+        <div class="container">
+            <div class="row" style="margin-top:50px;">
+                <div class="col-md-6">
+                    <div class="cm">
+                        <p style="border-bottom:2px solid #92ce73;max-width:350px;">The right to read is the right to mine.</p>
+                        <p><a href="http://contentmine.org">Read more about your rights.</a><br>
+                        <a href="http://contentmine.org">Read more about this project.</a></p>
+
+                        <p>This service is running at <a href="http://cottagelabs.com">Cottage Labs</a>. <br>
+                        <a href="mailto:us@cottagelabs.com">Contact us</a> if you have technical issues.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="cm">
+                        <p><br>&copy; Shuttleworth Foundation, for whom Peter Murray-Rust is a fellow.</p>
+                        <p>Unless otherwise noted, the content of this site is licensed under a <br><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 License</a>.</p>
+                        <p>The extracted facts are <a href="http://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <script>
+    jQuery(document).ready(function() {
+        var getUrlParameter = function(sParam) {
+            var sPageURL = window.location.search.substring(1);
+            var sURLVariables = sPageURL.split('&');
+            for (var i in sURLVariables ) {
+                var sParameterName = sURLVariables[i].split('=');
+                if (sParameterName[0] == sParam) {
+                    return sParameterName[1];
+                }
+            }
+        }
+        var url = getUrlParameter('url');
+        if ( url && url.length != 0 ) {
+            setTimeout(function() {
+                var cv = $('#urls').val();
+                cv.length == 0 ? false : cv = cv + '\n';
+                $('#urls').val(cv + url + '\n');
+            }, 1000);
+            var e = jQuery.Event("keypress");
+            e.which = 13;
+            $('#urls').trigger(e);
+        }
+    });
+    </script>
+        
+                    
+                    
+</template>
+    
