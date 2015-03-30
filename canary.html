@@ -149,7 +149,11 @@
                                 <option>phylotree</option>
                             </select></p>
                             <p><input type="text" id="regexurl" class="form-control" placeholder="Or enter a URL to your regex text file"></p>
+                            {{# if processing 'regex' }}
+                            <a class="btn disabled btn-block" href="#">PROCESSING REGEX</a>
+                            {{else}}
                             <a class="btn btn-info btn-block process" id="regex" href="#">Run regex</a>
+                            {{/if}}
                         </div>
                     </div>
                 </div>

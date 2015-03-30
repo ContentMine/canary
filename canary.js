@@ -80,6 +80,21 @@ if (Meteor.isClient) {
         },
         factlist: function() {
             return Facts.find({}, {sort: {createdAt: -1}});
+        },
+        processing: function(proctype) {
+            var ret = false;
+            var currentset = Sets.findOne(Session.get("canarysetid"));
+            for ( var u in currentset.urls ) {
+                var tu = currentset.urls[u];
+                if ( tu.results ) {
+                    if ( tu.results[proctype] ) {
+                        if ( tu.results[proctype].processing ) {
+                            ret = true;
+                        }
+                    }
+                }
+            }
+            return ret;
         }
     });
 
@@ -131,7 +146,7 @@ if (Meteor.isClient) {
                     Sets.update(currentset._id, {$set: {urls: urls}});
                 }
                 for ( var n in oldones ) {
-                    // TODO: throw away all facts about url oldones[n] for this set
+                    Facts.remove({url: oldones[n]});
                 }
                 for ( var n in newones ) {
                     Meteor.call('quickscrape',{url: newones[n], canarysetid: Session.get("canarysetid")})
@@ -164,10 +179,15 @@ if (Meteor.isServer) {
             var params = {
                 params: obj.params
             }
+            if ( params.params['-r.r'] ) {
+                var procr = obj.processor + '-' + params.params['-r.r'];
+            } else {
+                var procr = obj.processor;
+            }
             for ( var u in currentset.urls ) {
                 var tu = currentset.urls[u];
                 params.params.cid = tu.cid;
-                // TODO: delete any facts that came from same processor on this set on this url
+                Facts.remove({processor:procr, url:tu.url});
                 if ( tu.results === undefined ) { tu.results = {}; };
                 tu.results[obj.processor] = {processing: true};
                 Meteor.http.call('GET', cmapi+'ami'+obj.processor, params, function(sth,res) {
@@ -177,10 +197,9 @@ if (Meteor.isServer) {
                         var fc = res.data.facts[f];
                         fc.set = obj.canarysetid;
                         fc.url = tu.url;
-                        fc.processor = obj.processor;
+                        fc.processor = procr;
                         Meteor.call('createFact',fc);
                     }
-                    //$('#'+obj.processor).removeClass('disabled');
                     Sets.update(currentset._id, {$set: {urls: currentset.urls}});
                 });
             }
