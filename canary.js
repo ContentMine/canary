@@ -146,7 +146,7 @@ if (Meteor.isClient) {
                     Sets.update(currentset._id, {$set: {urls: urls}});
                 }
                 for ( var n in oldones ) {
-                    Facts.remove({url: oldones[n]});
+                    Meteor.call('removeFacts',{url: oldones[n]});
                 }
                 for ( var n in newones ) {
                     Meteor.call('quickscrape',{url: newones[n], canarysetid: Session.get("canarysetid")})
@@ -284,6 +284,9 @@ Meteor.methods({
         Facts.insert(obj);
         console.log('fact created');
     },
+    removeFacts: function(obj) {
+        Facts.remove({url: obj.url});
+    }
     createSet: function (obj) {
         var d = new Date();
         obj.createdAt = d;
