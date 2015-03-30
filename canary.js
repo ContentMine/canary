@@ -286,7 +286,7 @@ Meteor.methods({
     },
     removeFacts: function(obj) {
         Facts.remove({url: obj.url});
-    }
+    },
     createSet: function (obj) {
         var d = new Date();
         obj.createdAt = d;
