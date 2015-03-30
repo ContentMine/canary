@@ -72,7 +72,7 @@
                                 {{/if}}
                                 
                                 {{#if results.retrieve}}
-                                    {{#if results.quickscrape.processing}}
+                                    {{#if results.retrieve.processing}}
                                         <br>retrieving the file directly
                                     {{else}}
                                         <br>File retrieved directly:
@@ -80,6 +80,10 @@
                                         {{#if results.retrieve.unpdf}}
                                         <br>and PDF dumped to text:
                                         <br><a href="{{results.retrieve.unpdf}}">{{results.retrieve.unpdf}}</a>
+                                        {{#if results.retrieve.txt2html }}
+                                        <br>and as there was no html doc, one was made:
+                                        <br><a href="{{results.retrieve.txt2html}}">{{results.retrieve.txt2html}}</a>
+                                        {{/if}}
                                         {{/if}}
                                     {{/if}}
                                 {{/if}}
