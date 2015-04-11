@@ -23,10 +23,13 @@
 <template name="canary">
     
     <div class="container-fluid">
-        <div class="container" style="background:url(/CM.png);background-repeat:no-repeat;background-position:top right;padding-top:73px;margin-top:10px;">
+        <div class="container" style="margin-top:10px;">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-8">
                     {{> sharejsText docid=canarysetid id="urls"}}
+                </div>
+                <div class="col-md-4">
+                    <img src="/CM.png" style="width:100%;">
                 </div>
             </div>
         </div>
@@ -144,13 +147,15 @@
                             <p><select id="regextype" class="form-control">
                                 <option value="">choose a prepared regex type</option>
                                 <option>agriculture</option>
-                                <option>astrophysics</option>
+                                <option>astrophys</option>
+                                <option>consort0</option>
                                 <option>ebola</option>
-                                <option>figures</option>
+                                <option>figure</option>
                                 <option>genbank</option>
                                 <option>metadata</option>
                                 <option>pdb</option>
                                 <option>phylotree</option>
+                                <option>publication</option>
                             </select></p>
                             <p><input type="text" id="regexurl" class="form-control" placeholder="Or enter a URL to your regex text file"></p>
                             {{# if processing 'regex' }}

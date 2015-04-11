@@ -33,7 +33,6 @@ Router.map(function() {
         },
         data : function() {
             return {
-                facts : Facts.find({ set : this.params._id }, {sort : {creationAt : 'desc'}}),
                 canarysetid: this.params._id
             }
         }, 
