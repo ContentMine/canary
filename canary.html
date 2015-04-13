@@ -131,7 +131,19 @@
                                         {{/if}}
                                     {{/if}}
                                 {{/if}}
-                                
+
+                                {{#if results.identifier}}
+                                    {{#if results.identifier.processing}}
+                                        <br>Processing with identifier
+                                    {{else}}
+                                        {{#if results.identifier.factcount}}
+                                        <br>Retrieved {{results.identifier.factcount}} identifiers!
+                                        {{else}}
+                                        <br>Retrieved no identifiers...
+                                        {{/if}}
+                                    {{/if}}
+                                {{/if}}
+
                             {{else}}
                                 No results for this URL yet.
                             {{/if}}
@@ -182,6 +194,14 @@
                             <a class="btn disabled btn-block" href="#">PROCESSING SPECIES</a>
                             {{else}}
                             <a class="btn btn-info btn-block process" id="species" href="#">Run species</a>
+                            {{/if}}
+                        </div>
+                        <div class="well">
+                            <h4>Identifier <small>find entity identifiers</small></h4>
+                            {{# if processing 'identifier' }}
+                            <a class="btn disabled btn-block" href="#">PROCESSING IDENTIFIER</a>
+                            {{else}}
+                            <a class="btn btn-info btn-block process" id="identifier" href="#">Run identifier</a>
                             {{/if}}
                         </div>
                     </div>
