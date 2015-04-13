@@ -109,7 +109,7 @@ if (Meteor.isClient) {
                     params['-r.r'] = $('#regextype').val();
                 }
             }
-            if ( !params['-r.r'] ) {
+            if ( proctype == regex && !params['-r.r'] ) {
                 alert('Choose a regex type or provide a URL to your own regex file first!');
             } else {
                 //$('#'+proctype).addClass('disabled');

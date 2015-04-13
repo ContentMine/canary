@@ -113,13 +113,25 @@
                                         <br>Processing with regex
                                     {{else}}
                                         {{#if results.regex.factcount}}
-                                        <br>Retrieved {{results.regex.factcount}} facts!
+                                        <br>Retrieved {{results.regex.factcount}} regex facts!
                                         {{else}}
-                                        <br>Retrieved no facts...
+                                        <br>Retrieved no regex facts...
                                         {{/if}}
                                     {{/if}}
                                 {{/if}}
 
+                                {{#if results.species}}
+                                    {{#if results.species.processing}}
+                                        <br>Processing with species
+                                    {{else}}
+                                        {{#if results.species.factcount}}
+                                        <br>Retrieved {{results.species.factcount}} species facts!
+                                        {{else}}
+                                        <br>Retrieved no species facts...
+                                        {{/if}}
+                                    {{/if}}
+                                {{/if}}
+                                
                             {{else}}
                                 No results for this URL yet.
                             {{/if}}
@@ -162,6 +174,14 @@
                             <a class="btn disabled btn-block" href="#">PROCESSING REGEX</a>
                             {{else}}
                             <a class="btn btn-info btn-block process" id="regex" href="#">Run regex</a>
+                            {{/if}}
+                        </div>
+                        <div class="well">
+                            <h4>Species <small>find species names</small></h4>
+                            {{# if processing 'species' }}
+                            <a class="btn disabled btn-block" href="#">PROCESSING SPECIES</a>
+                            {{else}}
+                            <a class="btn btn-info btn-block process" id="species" href="#">Run species</a>
                             {{/if}}
                         </div>
                     </div>
