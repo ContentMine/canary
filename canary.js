@@ -116,6 +116,9 @@ if (Meteor.isClient) {
                 Meteor.call('ami', {processor: proctype, params: params, canarysetid: Session.get("canarysetid")} );
             }
         },
+        "click #visfacts": function (event) {
+            Meteor.call('visfacts',{canarysetid: Session.get("canarysetid")});
+        },
         "keypress #urls": function (event) {
             var currentset = Sets.findOne(Session.get("canarysetid"));
             var urls = [];
@@ -171,6 +174,18 @@ if (Meteor.isServer) {
     // TODO: MOST OF THESE METHODS HAVE REPEATED CODE - SHOULD ABSTRACT OUT TO A METHOD THAT UPDATES THE URLS DATA
     // JUST NOT DONE IT COS I AM LEARNING METEOR RIGHT NOW AND NOT THINKING TIDILY
     Meteor.methods({
+        visfacts: function(obj) {
+            var addr = 'http://contentmine.org/api/fact';
+            var facts = Facts.find({"set": obj.canarysetid});
+            facts.forEach(function(rec) {
+                console.log(rec);
+                delete rec._id;
+                Meteor.http.call('POST', addr, {data:rec, headers:{'content-type':'application/json'}}, function(sth,res) {
+                    console.log(sth);
+                    console.log(res);
+                });
+            });
+        },
         ami: function(obj) {
             console.log('starting ami ' + obj.processor);
             console.log(obj);
