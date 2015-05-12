@@ -37,6 +37,30 @@ hr {
     background-color:#92ce73;
 }
 
+.doingbtn{
+    margin-top:5px;
+}
+.processbtn{
+    display:block;
+    background-color:#92ce73;
+    border-color:#187c83;
+    margin-top:5px;
+    text-align:left;
+    padding-left:10px;
+}
+.processbtn:hover{
+    background-color:#187c83;
+}
+.processbtn small{
+    color:#333;
+}
+.processbox{
+    background-color:#92ce73;
+    border-color:#187c83;
+    margin-top:-10px;
+    border-top:none;
+}
+
 .cm{
     padding:5px;
     border-color:#187c83;
@@ -58,14 +82,6 @@ a.anchor {
 }
 
 #urls {
-    width:100%;
-    height:100%;
-    min-height:180px;
-    padding:5px;
-    margin:0;
-    background:transparent;
-    font-size:1em;
-    line-height:1em;
 }
 
 #speciescmd {

@@ -8,7 +8,7 @@
 
 cmapi = 'http://cmapi.cottagelabs.com/';
 
-var getUuid = function() {
+var uuid = function() {
     return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
         return v.toString(16);
@@ -22,7 +22,7 @@ Router.map(function() {
     this.route('home', {
         path : '/',
         action: function() {
-            this.redirect('/' + getUuid())
+            this.redirect('/' + uuid())
         }
     });
     this.route('set', {
@@ -64,16 +64,6 @@ if (Meteor.isClient) {
         urlscount: function() {
             return Sets.findOne(Session.get("canarysetid")).urls.length;
         },
-        /*factdoccount: function () {
-            var factdocs = [];
-            var f = Facts.find({});
-            for ( var i in f ) {
-                if ( factdocs.indexOf(f[i]['source']) == -1 ) {
-                    factdocs.push(f[i]['source']);
-                }
-            }
-            return factdocs.length;
-        },*/
         factcount: function () {
             return Facts.find({}).count();
         },
@@ -171,6 +161,16 @@ if (Meteor.isServer) {
         return Facts.find({"set": canarysetid});
     });
 
+    /*Meteor.publish("factdoccount", function (canarysetid) {
+        self = this;
+        var pipeline = [
+            {$match: {set: Session.get("canarysetid")}},
+            {$group: {_id: '$url', docs: {$sum: 1}}}
+        ];
+        docs = Facts.aggregate(pipeline);
+    });*/
+    
+    
     // TODO: MOST OF THESE METHODS HAVE REPEATED CODE - SHOULD ABSTRACT OUT TO A METHOD THAT UPDATES THE URLS DATA
     // JUST NOT DONE IT COS I AM LEARNING METEOR RIGHT NOW AND NOT THINKING TIDILY
     Meteor.methods({
