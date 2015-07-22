@@ -17,10 +17,6 @@ html, body{
     line-height:1em;
 }
 
-.container {
-    width:1300px;
-}
-
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Special Elite', cursive;
 }
@@ -37,30 +33,6 @@ hr {
     background-color:#92ce73;
 }
 
-.doingbtn{
-    margin-top:5px;
-}
-.processbtn{
-    display:block;
-    background-color:#92ce73;
-    border-color:#187c83;
-    margin-top:5px;
-    text-align:left;
-    padding-left:10px;
-}
-.processbtn:hover{
-    background-color:#187c83;
-}
-.processbtn small{
-    color:#333;
-}
-.processbox{
-    background-color:#92ce73;
-    border-color:#187c83;
-    margin-top:-10px;
-    border-top:none;
-}
-
 .cm{
     padding:5px;
     border-color:#187c83;
@@ -69,25 +41,39 @@ hr {
     color:#92ce73;
 }
 
+.cmc{
+    color:#92ce73;
+	text-decoration:underline;
+}
+
+.btn-cm{
+    background-color:#92ce73;
+	font-weight:bold;
+	color:white;
+	margin-bottom:2px;
+}
+.btn-disabled{
+	color:black;
+}
+.btn-disabled:hover{
+	cursor: default;
+}
+
 .tile {
     height:250px;
     overflow:hidden;
 }
 
-a.anchor {
+.anchor {
     display: block; 
     position: relative; 
     top: -50px; 
     visibility: hidden;
 }
 
-#urls {
+#customregex {
+	width:100%;
+	min-height:200px;
+	
 }
-
-#speciescmd {
-    width:100%;
-}
-
-
-
 

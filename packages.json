@@ -1,0 +1,6 @@
+{
+	"xml2js": "0.4.9",
+	"moment": "2.10.3",
+	"thresher": "0.1.5",
+    "xmlhttprequest": "1.7.0"
+}

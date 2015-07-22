@@ -11,3 +11,14 @@ mizzao:sharejs-ace
 iron:router
 http
 meteorhacks:aggregate
+simple:rest
+nimble:restivus
+cfs:standard-packages
+cfs:filesystem
+cfs:s3
+meteorhacks:npm
+
+
+npm-container
+mizzao:autocomplete
+percolate:synced-cron
