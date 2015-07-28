@@ -539,9 +539,11 @@ Meteor.methods({
 	indexFacts: function(canarysetid, bulk) {
 		console.log('uploading facts to catalogue for ' + canarysetid);
         var frl = factsindexurl + '_bulk';
-        var frld = frl.replace('_bulk','_query') + '?q=set:' + canarysetid;
-        // TODO: this should do a scroll query then bulk delete - delete by query is deprecated and not performant
-		Meteor.http.call('DELETE', frld, { data: bulk });
+        if ( !runlocal ) {
+            var frld = frl.replace('_bulk','_query') + '?q=set:' + canarysetid;
+            // TODO: this should do a scroll query then bulk delete - delete by query is deprecated and not performant
+            Meteor.http.call('DELETE', frld, { data: bulk });            
+        }
         if ( bulk === undefined ) {
     		var facts = Facts.find({set: canarysetid}).fetch();
             bulk = '';
