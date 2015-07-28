@@ -16,6 +16,7 @@ var catindexurl = function() {
 };
 
 var runlocal = false;
+var sendremote = true;
 if ( runlocal ) {
     userdir = '/home/workshop/workshop';
     regexesdir = userdir + '/regexes/';
@@ -418,6 +419,7 @@ Meteor.methods({
 				if ( proc == 'species' ) {
 					cmd += ' --sp.species --context 100 100 --sp.type binomial genus genussp';
 				}
+                console.log(cmd);
 				var child = aexec(cmd);
 				currentset.processed[params.processor].push(url);
 				var sds = sd + 'results/' + params.processor.replace('-','/') + '/';
@@ -556,15 +558,17 @@ Meteor.methods({
             console.log('a remote bulk set has been received');
         }
         if ( runlocal ) { frl = remotefactsindexurl(canarysetid); }
-        var xhr = new xmhtrq();
-        xhr.open('POST', frl, true);
-        xhr.onreadystatechange = function() {
-            if ( xhr.readyState==4 ){
-                //console.log(xhr.responseText);
-            }
-        };
-        xhr.send(bulk);
-        console.log('facts sent to index at ' + frl);
+        if ( !runlocal || ( runlocal && sendremote ) ) {
+            var xhr = new xmhtrq();
+            xhr.open('POST', frl, true);
+            xhr.onreadystatechange = function() {
+                if ( xhr.readyState==4 ){
+                    //console.log(xhr.responseText);
+                }
+            };
+            xhr.send(bulk);
+            console.log('facts sent to index at ' + frl);            
+        }
     },
 	indexMetadata: function(meta) {
 		console.log('uploading metadata to catalogue');
@@ -704,7 +708,7 @@ var saveregex = function(canarysetid,url,regex) {
 	var fl = setarticledir(canarysetid,url) + 'customregex.xml';
 	var content = '<compoundRegex title="custom">';
 	for ( var ln in regex.split('\n') ) {
-		content += '<regex>' + regex[ln] + '</regex>';
+		content += '<regex>' + regex.split('\n')[ln] + '</regex>';
 	}
 	content += '</compoundRegex>';
 	fs.writeFileSync(fl,content);
