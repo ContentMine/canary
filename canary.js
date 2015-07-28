@@ -8,18 +8,14 @@ var articlesdir = userdir + '/cm/articles/';
 var storeurl = 'http://store.contentmine.org/';
 var factsurl = 'http://facts.contentmine.org/';
 
-var factsindexurl = function() {
-	// TODO for running locally but pushing to remote index this needs to return
-	// http://canary.contentmine.org/api/sets/:canarysetid/facts/receive
-	return 'http://gateway:9200/contentmine/fact/';
-};
+var factsindexurl = 'http://gateway:9200/contentmine/fact/';
+
 var catindexurl = function() {
 	// TODO if running locally should return a canary api url that will handle uploads from local installs
 	return 'http://gateway:9200/catalogue/record/';
 };
 
 var runlocal = false;
-var sendremote = true;
 if ( runlocal ) {
     userdir = '/home/workshop/workshop';
     regexesdir = userdir + '/regexes/';
@@ -30,6 +26,9 @@ if ( runlocal ) {
     storeurl = 'file://' + userdir + '/cm/sets/';
     factsurl = 'http://facts.contentmine.org/';
 }
+var remotefactsindexurl = function(canarysetid) {
+    return 'http://canary.contentmine.org/api/sets/' + canarysetid + '/facts/receive';
+};
 
 var regexdir = function(regex) {
 	return regexesdir + regex + '.xml';
@@ -262,8 +261,9 @@ if (Meteor.isServer) {
 			return "yes, you could POST your facts here";
 		},
 		post: function() {
-			// TODO get the IP that this was received from and store it in the fact
-			Meteor.call('indexFacts',this.urlParams.canarysetid);
+            var bulk = this.request.body;
+            console.log(bulk);
+			Meteor.call('indexFacts',this.urlParams.canarysetid, bulk);
 		}
 	});
 	Restivus.addRoute('sets/:canarysetid/terms', {
@@ -301,13 +301,13 @@ if (Meteor.isServer) {
 	Restivus.addRoute('query/facts', {
         // this could actually be handled directly by an nginx route to the index
 		get: function() {
-            var frl = factsindexurl() + '_search?';
+            var frl = factsindexurl + '_search?';
             for ( var k in this.queryParams ) { frl += k + '=' + this.queryParams[k] + '&'; }
             return Meteor.http.call('GET', frl).data;
 		},
         post: function() {
             console.log(this.request.body);
-            var frl = factsindexurl() + '_search';
+            var frl = factsindexurl + '_search';
             return Meteor.http.call('POST', frl, { data: this.request.body }).data;
         }
 	});
@@ -536,19 +536,24 @@ Meteor.methods({
 		}
 		Meteor.call('indexFacts',canarysetid);
 	},
-	indexFacts: function(canarysetid) {
+	indexFacts: function(canarysetid, bulk) {
 		console.log('uploading facts to catalogue for ' + canarysetid);
-        var frl = factsindexurl() + '_bulk';
+        var frl = factsindexurl + '_bulk';
         var frld = frl.replace('_bulk','_query') + '?q=set:' + canarysetid;
         // TODO: this should do a scroll query then bulk delete - delete by query is deprecated and not performant
 		Meteor.http.call('DELETE', frld, { data: bulk });
-		var facts = Facts.find({set: canarysetid}).fetch();
-		var bulk = '';
-		for ( var i in facts ) {
-            facts[i].id = facts[i]._id;
-			bulk +=  '{index:{_id:"' + facts[i]._id + '"}}\n';
-            bulk += JSON.stringify( facts[i] ) + '\n';
-		}
+        if ( bulk === undefined ) {
+    		var facts = Facts.find({set: canarysetid}).fetch();
+            bulk = '';
+            for ( var i in facts ) {
+                facts[i].id = facts[i]._id;
+                bulk +=  '{index:{_id:"' + facts[i]._id + '"}}\n';
+                bulk += JSON.stringify( facts[i] ) + '\n';
+            }
+        } else {
+            console.log('a remote bulk set has been received');
+        }
+        if ( runlocal ) { frl = remotefactsindexurl(canarysetid); }
         var xhr = new xmhtrq();
         xhr.open('POST', frl, true);
         xhr.onreadystatechange = function() {
