@@ -1,10 +1,13 @@
 
-var storeurl = 'http://store.contentmine.org/'; // TODO for running locally should this point to local store?
+var userdir = '/home/cloo';
+var regexesdir = userdir + '/dev/contentmine/src/ami-regexes/';
+var scraperdir = userdir + '/dev/contentmine/src/journal-scrapers/scrapers/';
+var setsdir = userdir + '/cm/sets/';
+var articlesdir = userdir + '/cm/articles/';
+
+var storeurl = 'http://store.contentmine.org/';
 var factsurl = 'http://facts.contentmine.org/';
-var regexesdir = '/home/cloo/dev/contentmine/src/ami-regexes/';
-var scraperdir = '/home/cloo/dev/contentmine/src/journal-scrapers/scrapers/';
-var setsdir = '/home/cloo/cm/sets/';
-var articlesdir = '/home/cloo/cm/articles/';
+
 var factsindexurl = function() {
 	// TODO for running locally but pushing to remote index this needs to return
 	// http://canary.contentmine.org/api/sets/:canarysetid/facts/receive
@@ -14,6 +17,20 @@ var catindexurl = function() {
 	// TODO if running locally should return a canary api url that will handle uploads from local installs
 	return 'http://gateway:9200/catalogue/record/';
 };
+
+var runlocal = false;
+var sendremote = true;
+if ( runlocal ) {
+    userdir = '/home/workshop/workshop';
+    regexesdir = userdir + '/regexes/';
+    scraperdir = userdir + '/journal-scrapers/scrapers/';
+    setsdir = userdir + '/cm/sets/';
+    articlesdir = userdir + '/cm/articles/';
+    
+    storeurl = 'file://' + userdir + '/cm/sets/';
+    factsurl = 'http://facts.contentmine.org/';
+}
+
 var regexdir = function(regex) {
 	return regexesdir + regex + '.xml';
 };
