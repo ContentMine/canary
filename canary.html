@@ -102,7 +102,6 @@
 
 
 
-
 <template name="canary">
 
 	<div class="container-fluid wrapper-header-first" style="background-color:white;border-bottom:4px solid #92ce73;margin-bottom:10px;">
@@ -161,23 +160,23 @@
 
 					<div class="row" style="margin-top:10px;margin-bottom:20px;">
 						{{#unless equals urlscount 0}}
-						<div class="col-md-6"><a class="btn btn-block btn-cm" href="#" id="addurls"><span class="glyphicon glyphicon-plus"></span> Retrieve</a></div>
+						<div class="col-md-3"><a class="btn btn-block btn-cm" href="#" id="addurls"><span class="glyphicon glyphicon-plus"></span> Retrieve</a></div>
                         {{else}}
 						<div class="col-md-12"><a class="btn btn-block btn-cm" href="#" id="addurls"><span class="glyphicon glyphicon-plus"></span> Retrieve</a></div>
 						{{/unless}}
-						
-						{{#unless equals urlscount 0}}
-						{{#unless equals failedcount 0}}
-						<div class="col-md-3"><a class="btn btn-block btn-danger" href="#" id="deleteurls"><span class="glyphicon glyphicon-remove"></span> Remove all</a></div>
-                        {{else}}
-						<div class="col-md-6"><a class="btn btn-block btn-danger" href="#" id="deleteurls"><span class="glyphicon glyphicon-remove"></span> Remove all</a></div>
-						{{/unless}}
-						{{/unless}}
-						
+												
 						{{#unless equals failedcount 0}}
 						<div class="col-md-3"><a class="btn btn-block btn-warning" href="#" id="deletefailedurls"><span class="glyphicon glyphicon-remove"></span> Remove failures</a></div>
 						{{/unless}}
-						
+
+						{{#unless equals nofactscount 0}}
+						<div class="col-md-3"><a class="btn btn-block btn-warning" href="#" id="deletenofactsurls"><span class="glyphicon glyphicon-remove"></span> Remove URLs with no facts</a></div>
+						{{/unless}}
+
+						{{#unless equals urlscount 0}}
+						<div class="col-md-3"><a class="btn btn-block btn-danger" href="#" id="deleteurls"><span class="glyphicon glyphicon-remove"></span> Remove all</a></div>
+						{{/unless}}
+
 					</div>
 				</div>
 			</div>

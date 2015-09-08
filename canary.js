@@ -81,19 +81,25 @@ Router.map(function() {
             };
         }, 
         action : function() {
-            if ( Sets.findOne(this.params._id) === undefined ) {
-                Meteor.call('createSet',{
-                    _id: this.params._id,
-                    urls: [],
-					articles: [],
-					failed: [],
-					processed: [],
-					processes: []
-                });
-            }
-            Session.set('canarysetid', this.params._id);
-            Meteor.subscribe('facts', this.params._id);
-            this.render();
+            if ( this.params._id.indexOf('-') !== -1 || this.params._id.indexOf(' ') !== -1 || this.params._id !== this.params._id.toLowerCase() ) {
+                var tid = this.params._id.replace(/-/g,'').replace(/ /g,'').toLowerCase();
+                console.log('Redirecting to tidied version of ' + this.params._id + ' - ' + tid);
+                this.redirect('/' + tid);
+            } else {
+                if ( Sets.findOne(this.params._id) === undefined ) {
+                    Meteor.call('createSet',{
+                        _id: this.params._id,
+                        urls: [],
+                        articles: [],
+                        failed: [],
+                        processed: [],
+                        processes: []
+                    });
+                }
+                Session.set('canarysetid', this.params._id);
+                Meteor.subscribe('facts', this.params._id);
+                this.render();                
+            }
         }
     });
 });
@@ -170,6 +176,15 @@ if (Meteor.isClient) {
         failedcount: function() {
             return Sets.findOne(Session.get("canarysetid")).failed.length;
         },
+        nofactscount: function() {
+            // for each article check if there are any facts for it, and return the count of articles with no facts
+            var s = Sets.findOne(Session.get("canarysetid"));
+            nofacts = 0;
+            for ( var u in s.articles ) {
+                if ( Facts.find({url: s.articles[u]}).count() === 0 ) nofacts += 1;
+            }
+            return nofacts;
+        },
         factcount: function () {
             return Facts.find({}).count();
         },
@@ -196,7 +211,6 @@ if (Meteor.isClient) {
 
     Template.canary.events({
         "click .process": function (event) {
-			var d = new Date();
 			Session.set("processing",event.target.id);
             var params = {
 				processor: event.target.id,
@@ -218,6 +232,9 @@ if (Meteor.isClient) {
         },
         "click #deletefailedurls": function(event) {
 	    	Meteor.call('removeUrlsFromSet', Session.get("canarysetid"), 'failed');
+        },
+        "click #deletenofactsurls": function(event) {
+	    	Meteor.call('removeUrlsFromSet', Session.get("canarysetid"), 'nofacts');
         },
         "click #addurls": function (event) {
 			var curls = $('#urls').val().split('\n');
@@ -252,6 +269,16 @@ if (Meteor.isServer) {
 	});
 	Restivus.addCollection(Facts);
 	Restivus.addCollection(Sets);
+    Restivus.addRoute('remove/:coll', {
+        delete: function() {
+            if ( this.urlParams.coll === 'facts' ) {
+                Facts.remove({});
+            } else if ( this.urlParams.coll === 'sets' ) {
+                Sets.remove({});
+            }
+            return '';
+        }
+    });
 	Restivus.addRoute('sets/:canarysetid/facts', {
 		get: function() {
 			return {status: 'success', data: Facts.find({set: this.urlParams.canarysetid}, {sort: {createdAt: -1}}).fetch() };
@@ -312,24 +339,60 @@ if (Meteor.isServer) {
             return Meteor.http.call('POST', frl, { data: this.request.body }).data;
         }
 	});
-	
-	// TODO: add a panel button to allow setting of schedules to getpapers and process them
-	// this may be a premium feature though, along with running on private articles 
-	
-	// TODO: check if this creates the same job over and over, or just once. It is not clear where this should go
+		
+    var dated = function( delim, less ) {
+        if ( delim === undefined ) delim = '';
+        if ( less === undefined ) less = 3;
+        var date = new Date();
+        if ( less ) date.setDate(date.getDate() - less);
+        var dd = date.getDate();
+        var mm = date.getMonth()+1;
+        var yyyy = date.getFullYear();
+        if ( dd<10 ) dd = '0'+dd;
+        if ( mm<10 ) mm = '0'+mm;
+        return yyyy + delim + mm + delim + dd;
+    };
+    var d = new Date();
+    console.log(d);
+    var todayset = function() {
+        return 'daily' + dated();
+    };
 	SyncedCron.add({
 		name: 'Create daily set',
 		schedule: function(parser) {
-			// parser is a later.parse object
-			return parser.text('every day at 0500');
+			return parser.text('at 2:30 am');
 		},
 		job: function() {
-			// get papers via query
-			// retrieve and normalise all of them
-			// process them with everything
+            if ( Sets.findOne( todayset() ) === undefined ) {
+                Meteor.call('createSet',{
+                    _id: todayset(),
+                    urls: [],
+                    articles: [],
+                    failed: [],
+                    processed: [],
+                    processes: []
+                });
+            }
+            var qry = 'FIRST_PDATE:' + dated(delim='-') + ' JOURNAL:"plos one"';
+			Meteor.call('getPapers', qry, todayset() );
 		}
 	});
-	//SyncedCron.start();
+	SyncedCron.add({
+		name: 'Process daily set',
+		schedule: function(parser) {
+			return parser.text('at 6:00 am');
+		},
+		job: function() {
+            var availableProcesses = ['species','identifier','gene','sequence','phylo'];
+            for ( var i in availableProcesses ) {
+                Meteor.call('process', {
+                    processor: availableProcesses[i],
+                    canarysetid: todayset()
+                });
+            }
+		}
+	});
+	SyncedCron.start();
 	
 	Meteor.methods({});
 }
@@ -354,6 +417,12 @@ var aexec = Async.wrap(eexec);
 var xmhtrq = Meteor.npmRequire('xmlhttprequest').XMLHttpRequest;
 
 Meteor.methods({
+    sets: function() {
+        return {
+            sets: Sets.find({}).fetch(), 
+            count: Sets.find({}).count()
+        };
+    },
 	terms: function(collection,field,match,simple) {
         if ( !collection ) { collection = 'facts'; }
         if ( !field ) { field = 'fact'; } // TODO: check if field has commas, if so split and do terms across multiple fields
@@ -386,11 +455,12 @@ Meteor.methods({
         }
         return vals;
 	},
+    
 	process: function(params) {
 		var currentset = Sets.findOne(params.canarysetid);
-		console.log('beginning process ' + proc + ' for ' + params.canarysetid);
+		console.log('beginning process ' + params.processor + ' for ' + params.canarysetid);
 		if ( !currentset.processed ) { currentset.processed = {}; }
-		if ( !currentset.processed[proc] ) { currentset.processed[params.processor] = []; }
+		if ( !currentset.processed[params.processor] ) { currentset.processed[params.processor] = []; }
 		if ( params.rerun ) {
 			currentset.processed[params.processor] = [];
 			Meteor.call('removeFacts', undefined, params.processor);
@@ -419,7 +489,6 @@ Meteor.methods({
 				if ( proc == 'species' ) {
 					cmd += ' --sp.species --context 100 100 --sp.type binomial genus genussp';
 				}
-                console.log(cmd);
 				var child = aexec(cmd);
 				currentset.processed[params.processor].push(url);
 				var sds = sd + 'results/' + params.processor.replace('-','/') + '/';
@@ -507,11 +576,11 @@ Meteor.methods({
 			searchstr = searchstr.replace('ieee ','').replace('IEEE ','');
 			api = 'ieee';
 		}
-		var cmd = "getpapers --query '" + searchstr + "' --outdir " + sd;
+		var cmd = "getpapers --query '" + searchstr + "' --outdir " + sd + ' --all';
 		var child = aexec(cmd);
 		console.log('getpapers finished - now processing fulltext urls file');
 		// now read the list of URLs that came out of the search
-		var urls = fs.readFileSync(sd + 'fulltext_OA_html_urls.txt').toString().split("\n");
+		var urls = fs.readFileSync(sd + 'fulltext_html_urls.txt').toString().split("\n");
 		for ( var i in urls ) {
 			Meteor.call('addUrlToSet', urls[i], canarysetid);
 		}
@@ -615,6 +684,14 @@ Meteor.methods({
 		}
 	},
 	addUrlToSet: function(url, canarysetid) {
+        if ( url.indexOf('10') === 0 ) {
+            url = 'http://dx.doi.org/' + url;
+        }
+        if ( url.indexOf('dx.doi.org') !== -1 ) {
+            console.log('Attempting to resolve the redirect of ' + url);
+            url = aresolve(url);
+            console.log('URL is now ' + url);
+        }
 		var currentset = Sets.findOne(canarysetid);
 		if ( currentset.urls.indexOf(url) == -1 ) {
 			currentset.urls.push(url);
@@ -650,9 +727,23 @@ Meteor.methods({
 	removeUrlsFromSet: function(canarysetid, typ) {
 		var currentset = Sets.findOne(canarysetid);
 		if ( !typ ) { typ = 'articles'; }
-		for ( var i in currentset[typ] ) {
-			Meteor.call('removeUrlFromSet', currentset[typ][i], canarysetid);
-		}
+        if ( typ === 'nofacts' ) {
+            for ( var u in currentset.articles ) {
+                if ( Facts.find({url: s.articles[u]}).count() === 0 ) {
+                    Meteor.call('removeUrlFromSet', s.articles[u], canarysetid);
+                }
+            }
+            return nofacts;
+            
+        } else {
+            for ( var i in currentset[typ] ) {
+                if ( typ === 'processed' ) {
+                    Meteor.call('removeUrlFromSet', i, canarysetid);
+                } else {
+                    Meteor.call('removeUrlFromSet', currentset[typ][i], canarysetid);            
+                }
+            }            
+        }
 	}	
 });
 
@@ -669,6 +760,18 @@ if (typeof String.prototype.startsWith !== 'function') {
     };
 }
 
+
+var resolve= function(url, callback) {
+	var request = Meteor.npmRequire('request');
+    request.head(url, function (err, res, body) {
+        if ( res === undefined ) {
+            callback(null, url);
+        } else {
+            callback(null, res.request.uri.href);        
+        }
+    });
+};
+var aresolve = Async.wrap(resolve);
 
 var thresh = function(sd, url, callback) {
 	fs.mkdirSync(sd);
