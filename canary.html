@@ -70,12 +70,12 @@
 				<p>
 					In the workspace you can create a collection of articles to work on, and they will be retrieved 
 					and normalised, which makes them ready for processing with our content mining tools. You can 
-					then choose and customise the processes you'd like to run on the articles, and finally you can 
+					then run our currently available processes on the articles, and finally you can 
 					browse the facts extracted from your collection.
 				</p>
 				<p>
-					After that, you can upload your articles and facts to our CATalogue, and discover other related 
-					works and visualise the relationships between them all.
+					After that, you can browse our catalogue and discover other related 
+					works and explore the relationships between them all.
 				</p>
 				<hr>
 				{{> notes}}
@@ -111,11 +111,8 @@
 			</div>
 			<nav class="col-xs-12 col-sm-12 col-lg-8" role="navigation">
 				<ul class="nav navbar-nav">
-					<li style="margin-right:50px;"><h2><a class="showpanel" which="articles" href="">Articles ({{articlescount}})</a></h2></li>
-					<li style="margin-right:50px;"><h2><a class="showpanel" which="processes" href="">Processes
-						{{#if processing}} <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>{{/if}}
-					</a></h2></li>
-					<li style="margin-right:50px;"><h2><a class="showpanel" which="facts" href="">Facts ({{factcount}})</a></h2></li>
+					<li style="margin-right:50px;"><h2><a href="#">Articles ({{articlescount}})</a></h2></li>
+					<li style="margin-right:50px;"><h2><a target="_blank" href="{{factsurl}}">Facts ({{factcount}})</a></h2></li>
 				</ul>
 			</nav>
 		</div>		
@@ -142,11 +139,13 @@
 						<p>
                             Welcome to your workspace! Share the URL above to bring in collaborators. 
                             Provide URLs below to the articles you want to process, then click "retrieve". 
-                            Once successfully retrieved, you can move on to the "processes".<br>
+                            Once successfully retrieved, you can then click to "process" them. Read more about 
+                            the processes we can perform 
+                            <a target="_blank" href="http://contentmine.org/processes">HERE</a>. <br>
                             You can also click the blue success tick to open a directory of files related to 
                             the article. Add or remove articles any time to build up your collection.<br>
                             EXPERIMENTAL: you can also provide search queries that meet the source formats we 
-                            can process (currently eupmc, arxiv, ieee). Type the format name on a line followed 
+                            can process (currently just eupmc). Type the format name on a line followed 
                             by a space then the query you want to run. Read about the query formats 
                             <a target="_blank" href="https://github.com/ContentMine/getpapers/wiki">HERE</a>.
 						</p>
@@ -156,7 +155,7 @@
 			
 			<div class="row">
 				<div class="col-md-12">
-					<textarea name="urls" id="urls" class="form-control" placeholder="Type or paste new URLs here (or one per line) OR provide search terms (read the help to learn how)" style="min-height:120px;"></textarea>
+					<textarea name="urls" id="urls" class="form-control" placeholder="Type or paste new URLs or DOIs here (or one per line) OR provide EXPERIMENTAL search terms (read the help to learn how)" style="min-height:120px;"></textarea>
 
 					<div class="row" style="margin-top:10px;margin-bottom:20px;">
 						{{#unless equals urlscount 0}}
@@ -176,8 +175,24 @@
 						{{#unless equals urlscount 0}}
 						<div class="col-md-3"><a class="btn btn-block btn-danger" href="#" id="deleteurls"><span class="glyphicon glyphicon-remove"></span> Remove all</a></div>
 						{{/unless}}
+					</div>
+                    
+					<div class="row" style="margin-top:10px;margin-bottom:20px;">
+                        {{#unless equals urlscount 0}}
+                    	{{#if processing}}
+                        <div class="col-md-12"><a class="btn btn-block btn-disabled" href="#"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Processing in progress...</a></div>
+                        {{else}}
+						{{#if equals processedcount 0}}
+						<div class="col-md-12"><a class="btn btn-block btn-info doprocesses" rerun="true" href="#"><span class="glyphicon glyphicon-plus"></span> Process all</a></div>
+                        {{else}}
+						<div class="col-md-6"><a class="btn btn-block btn-info doprocesses" rerun="true" href="#"><span class="glyphicon glyphicon-plus"></span> Process all</a></div>
+						<div class="col-md-6"><a class="btn btn-block btn-info doprocesses" href="#"><span class="glyphicon glyphicon-plus"></span> Process new</a></div>
+						{{/if}}
+                        {{/if}}
+                        {{/unless}}
 
 					</div>
+
 				</div>
 			</div>
 
@@ -212,24 +227,22 @@
 
 			<table class="table table-striped table-bordered">
 				<tbody>
-					{{#each currentset.urls}}
+					{{#each objectToPairs currentset.urls}}
 					<tr>
 						<td>
-							{{#if retrieved this }}
-							<a target="_blank" href="{{uidlink this}}"><span class="glyphicon glyphicon-ok"></span></a>
+							{{#if value.articled }}
+							<a target="_blank" href="{{uidlink value.url}}"><span class="glyphicon glyphicon-ok"></span></a>
 							{{else}}
-							{{#if failed this }}
+							{{#if value.failed }}
 							<span class="glyphicon glyphicon-minus"></span>
 							{{else}}
 							<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
 							{{/if}}
 							{{/if}}
-							{{#unless equals hasfacts this 0}}
-							{{hasfacts this}}
-							{{/unless}}
+							{{value.facts}}
 						</td>
-						<td>{{this}}</td>
-						<td><a class="deleteurl glyphicon glyphicon-remove" which="{{this}}" href="#" style="font-weight:bold;color:red;"></a></td>
+						<td>{{value.url}}</td>
+						<td><a class="deleteurl glyphicon glyphicon-remove" which="{{value.url}}" href="#" style="font-weight:bold;color:red;"></a></td>
 					</tr>
 					{{/each}}
 				</tbody>
@@ -359,45 +372,6 @@
 			</div>
 		</div>
 
-		<div class="panels" id="facts">
-			<div class="row">
-				<div class="col-md-8">
-					<div class="alert alert-info">
-						<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-						<p>
-							All the facts that could be found from the articles in your set are displayed below. 
-							You can add more articles and run / re-run processes to update this fact collection. 
-							Click the name of any fact to access the 
-							<a target="_blank" href="http://facts.contentmine.org">ContentMine facts app</a>, 
-							where you can filter the facts and articles by various values, and explore the relations between them.
-						</p>
-					</div>
-				</div>
-				<div class="col-md-4">
-					<a class="btn btn-info btn-block" href="http://facts.contentmine.org" target="_blank" style="margin-bottom:10px;">
-						Go to the ContentMine facts app</a>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-md-12">
-				</div>
-			</div>
-			<div class="row">
-				{{#each factlist}}
-				<div class="col-md-4">
-					<div class="well" style="padding:5px;height:280px;overflow:hidden;border-color:#187c83;border-width:3px;background-color:#fff;color:#92ce73;">
-						<p style="font-size:1em;">{{pre}}</p>
-						<p><a target="_blank" href="{{facturl _id}}" style="color:#187c83;font-weight:bold;font-size:2em;">{{fact}}</a></p>
-						<p style="font-size:1em;">{{post}}</p>
-						<p style="font-size:0.8em;color:black;">{{processor}}<br>{{url}}</p>
-					</div>
-				</div>
-				{{/each}}
-			</div>			
-		</div>
 
 		
 		<div class="panels" id="config">
