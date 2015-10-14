@@ -43,6 +43,11 @@ var remotemetadataindexurl = function(canarysetid) {
     return 'http://api.contentmine.org/sets/' + canarysetid + '/metadata/receive';
 };
 
+// which AMI processes should be run when processing
+var availableProcesses = ['species','gene','sequence']; // rrid identifier phylo others?
+
+// ==========================================================================================
+
 // simple methods that return parts of on-disk locations for finding stuff, generated from the above settings
 var regexdir = function(regex) {
 	return regexesdir + regex + '.xml';
@@ -59,9 +64,6 @@ var setdir = function(canarysetid) {
 var setarticledir = function(canarysetid,url) {
 	return setdir(canarysetid) + uid(url) + '/';
 };
-
-// which AMI processes should be run when processing
-var availableProcesses = ['species','gene','sequence']; // rrid identifier phylo others?
 
 // simple method to generate a uuid
 var uuid = function() {
