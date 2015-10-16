@@ -525,7 +525,7 @@ Meteor.methods({
 					proc = parts[0];
 					regex = parts[1];
 				}
-				if (proc == 'rrid') {
+				if ( proc == 'rrid' ) {
 					var cmd = '/usr/bin/ami2-identifier' + ' -q ' + sd + ' --input scholarly.html';
 				} else {
 					var cmd = '/usr/bin/ami2-' + proc + ' -q ' + sd + ' --input scholarly.html';
