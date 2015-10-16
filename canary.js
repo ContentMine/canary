@@ -525,7 +525,12 @@ Meteor.methods({
 					proc = parts[0];
 					regex = parts[1];
 				}
-				var cmd = '/usr/bin/ami2-' + proc + ' -q ' + sd + ' --input scholarly.html';
+				if (proc == 'rrid') {
+					var cmd = '/usr/bin/ami2-identifier' + ' -q ' + sd + ' --input scholarly.html';
+				} else {
+					var cmd = '/usr/bin/ami2-' + proc + ' -q ' + sd + ' --input scholarly.html';
+				}
+				
 				if ( regex ) {
 					if ( regex === 'custom' ) {
 						var cr = saveregex(params.canarysetid,url,params.custom);
