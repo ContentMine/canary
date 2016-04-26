@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>ContentMine CATalogue</title>
+    <meta name="description" content="the ContentMine catalogue">
+    <meta name="author" content="mark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- get jquery -->
+    <script type="text/javascript" src="http://static.cottagelabs.com/jquery-1.10.2.min.js"></script>
+
+     <!-- get jquery-ui -->
+    <link rel="stylesheet" href="http://static.cottagelabs.com/jquery-ui-1.10.3.custom/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
+    <script type="text/javascript" src="http://static.cottagelabs.com/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
+
+    <!-- get bootstrap -->
+    <link rel="stylesheet" href="http://static.cottagelabs.com/bootstrap-3.0.3/css/bootstrap.min.css">
+    <script type="text/javascript" src="http://static.cottagelabs.com/bootstrap-3.0.3/js/bootstrap.min.js"></script>
+
+    <!-- get d3 -->
+    <script type="text/javascript" src="http://static.cottagelabs.com/d3/d3.min.js"></script>
+    
+    <!-- get select2 -->
+    <script type="text/javascript" src="http://static.cottagelabs.com/select2-release-3.2/select2.min.js"></script>
+    <link rel="stylesheet" href="http://static.cottagelabs.com/select2-release-3.2/select2.css">
+    <link rel="stylesheet" href="http://static.cottagelabs.com/select2-release-3.2/select2-bootstrap.css">
+
+    <!-- get graphview -->
+    <script type="text/javascript" src="http://static.cottagelabs.com/jquery.graphview.js"></script>
+    
+    <style>
+    .graphview_panel{
+        font-size:0.9em;
+    }
+    </style>
+</head>
+
+
+<body>
+
+<!--
+<div class="container" style="margin-top:10px;">
+    <div class="panel panel-default" id="searchfeedback">
+        <div class="panel-heading" style="background-color:white;padding:0px;">
+            <div class="input-group" style="margin-left:-1px;margin-top:-1px;margin-bottom:-6px;margin-right:-2px;">
+                <div class="input-group-btn">
+                    <button class="btn btn-info" alt="previous" title="previous" style="height:50px;font-size:1.6em;background-color:#bde6f2;border-color:#bde6f2;color:#333;"><</button>
+                </div>
+                <input type="text" class="form-control" id="searchbox" placeholder="search..." style="font-size:1.6em;height:50px;">
+                <input type="text" class="form-control" id="pagination" placeholder="pagination" value="show 25, from 0, of 1000000" style="font-size:1.6em;height:50px;display:none;background-color:#bde6f2;">
+                <div class="input-group-btn">
+                    <button class="btn btn-default" id="showsearchoptions" alt="show/hide search options" title="show/hide search options" style="height:50px;font-size:1.6em;">: :</button>
+                    <button class="btn btn-info" alt="next" title="next" id="pagenext" style="height:50px;font-size:1.6em;background-color:#bde6f2;border-color:#bde6f2;color:#333;">></button>
+                </div>
+            </div>
+            <div id="chosentags" style="margin-top:5px;"></div>
+        </div>
+        <div class="panel-body section" id="allthesearchoptions">
+            <div class="col-md-10" id="suggestions" style="border-right:1px solid #ccc;"></div>
+            <div class="col-md-2" id="searchingoptions">
+                <p>Graph settings:</p>
+                <p><input type="checkbox" class="vissetting" id="showtags" checked="checked"> show tags</p>
+                <p><input type="checkbox" class="vissetting" id="showentities" checked="checked"> show entities</p>
+                <p><input type="checkbox" class="vissetting" id="showanswers"> show answers</p>
+            </div>
+        </div>
+    </div>
+</div>
+-->
+    
+	
+	<div class="container-fluid wrapper-header-first" style="background-color:white;border-bottom:4px solid #92ce73;margin-bottom:10px;">
+		<div class="container header-first">
+			<div class="navbar-header col-xs-12 col-sm-12 col-lg-4">
+				<a class="navbar-brand" href="http://contentmine.org/" alt="Return to the ContentMine website" title="Return to the ContentMine website"><img src="http://contentmine.org/wp-content/themes/sage_contentmine-manual.org/assets/images/logo-web.png" style="height:100%;margin-left:-20px;"></a>
+			</div>
+			<nav class="col-xs-12 col-sm-12 col-lg-8" role="navigation">
+				<ul class="nav navbar-nav">
+					<li style="margin-right:50px;"><h2>CATalogue</h2></li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+		
+    <div class="container">    
+		<div class="row">
+			<div class="col-md-12">
+				<div id="searchresults">
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+<script>
+    
+(function($) {
+    $.fn.bindWithDelay = function( type, data, fn, timeout, throttle ) {
+        var wait = null;
+        var that = this;
+
+        if ( $.isFunction( data ) ) {
+            throttle = timeout;
+            timeout = fn;
+            fn = data;
+            data = undefined;
+        }
+
+        function cb() {
+            var e = $.extend(true, { }, arguments[0]);
+            var throttler = function() {
+                wait = null;
+                fn.apply(that, [e]);
+            };
+
+            if (!throttle) { clearTimeout(wait); }
+            if (!throttle || !wait) { wait = setTimeout(throttler, timeout); }
+        }
+
+        return this.bind(type, data, cb);
+    };
+})(jQuery);
+
+jQuery(document).ready(function() {
+    
+$('#allthesearchoptions').hide();
+var showsearchoptions = function(event) {
+    event.preventDefault();
+    $('#allthesearchoptions').toggle('fast');
+}
+$('#showsearchoptions').bind('click',showsearchoptions);
+
+var showpagination = function() {
+    $('#searchbox').hide();
+    $('#showsearchoptions').hide();
+    $('#pagination').show();
+}
+$('#pagenext').bind('mouseenter',showpagination);
+
+var hidepagination = function() {
+    if ( !$('#pagination').is(':focus') ) {
+        $('#pagination').hide();
+        $('#showsearchoptions').show();
+        $('#searchbox').show('fast').focus();
+    }
+}
+$('#pagination').bind('mouseleave',hidepagination);
+    
+var unique = function(a) {
+    for(var i=0; i<a.length; ++i) {
+        for(var j=i+1; j<a.length; ++j) {
+            if(a[i] === a[j])
+                a.splice(j--, 1);
+        }
+    }
+    return a;
+};
+
+function resultrecord(data) {
+	if ( ! ( 'title' in data ) ) { return '<tr><td>' + JSON.stringify(data) + '</td></tr>'; }
+	
+	var url = '';
+	if ( 'identifier' in data ) {
+		for ( var i in data.identifier ) {
+			if ( data.identifier[i].type && data.identifier[i].type.toLowerCase() === 'doi' ) {
+				url= 'http://dx.doi.org/' + data.identifier[i].id;
+			}
+		}
+	}
+	if ( url === '' && 'link' in data ) {
+		url = data.link[0].url;
+	}
+
+    var details = '<tr><td>';
+	if ( url !== '' ) {
+	    details += '<h4><a target="_blank" href="' + url + '">' + data.title + '</a></h4>';	
+	} else {
+	    details += '<h4>' + data.title + '</h4>';
+	}
+	details += '<p>';
+	if ( 'author' in data ) {
+		details += 'by ';
+		for ( var i in data.author ) {
+			if ( i != 0 ) {
+				details += ', ';
+			}
+			details += '<a class="graphview_searchable" style="color:black;" alt="search this value" title="search this value" href="#">';
+            details += data.author[i].name;
+            details += '</a>';
+		}
+		details += '<br>';
+	}
+	if ( 'journal' in data ) {
+		details += 'in <i>';
+	    details += '<a class="graphview_searchable" style="color:black;" alt="search this value" title="search this value" href="#">';
+        details += data.journal.title;
+        details += '</a>';
+        details += '</i> ';
+		if ( 'volume' in data.journal ) { details += data.journal.volume + ' '; }
+		if ( 'issue' in data.journal ) { details += data.journal.issue + ' '; }
+		if ( 'number' in data.journal ) { details += data.journal.number + ' '; }
+		if ( 'year' in data.journal ) {
+			details += ' (';
+    	    details += '<a class="graphview_searchable" style="color:black;" alt="search this value" title="search this value" href="#">';
+            details += data.journal.year;
+            details += '</a>';
+            details += ') ';
+		} else if ( 'year' in data ) {
+			details += ' (';
+    	    details += '<a class="graphview_searchable" style="color:black;" alt="search this value" title="search this value" href="#">';
+            details += data.year;
+            details += '</a>';
+            details += ') ';
+		}
+	}
+	details += '</p>';
+	var kw = [];
+	if ( 'keywords' in data ) { kw = kw.concat(data.keywords); }
+	if ( 'subject' in data ) { kw = kw.concat(data.subject); }
+	kw = unique(kw);
+	if ( kw.length !== 0 ) {
+		details += '<p>';
+		for ( var i in kw ) {
+			if ( i != 0 ) { details += ', '; }
+    	    details += '<a class="graphview_searchable" style="color:black;" alt="search this value" title="search this value" href="#">';
+			details += kw[i];
+            details += '</a>';
+		}
+		details += '</p>';
+	}
+	if ( 'abstract' in data ) {
+		//details += '<p>' + data.abstract + '</p>';
+	}
+    details += '</td></tr>';
+    return details;
+}
+
+var addtosearch = function(event) {
+    event.preventDefault();
+    // could also get the data type if it is added to the link syntax
+    var val = $(this).text();
+    var vals = $('.query_string').select2("val");
+    if ( vals.indexOf(val) === -1 ) { vals.push(val); }
+    $('.query_string').select2("val", vals);
+    $('.query_string').trigger('change');
+}
+var showresults = function(data) {
+    $('#searchbox').hide();
+    $('#pagination').show('fast');
+    var restable = '<table id="searchresulttable" class="table table-striped table-bordered" style="background:white;">';
+    for ( var r in data.hits.hits ) {
+        restable += resultrecord(data.hits.hits[r]._source);
+    }
+    restable += '</table>';
+    $('.graphview_panel').html(restable);
+    $('.graphview_total').html(data.hits.total);
+    $('.graphview_loading').html('... LOADING').hide();
+    if ( data.hits.total == 0 ) {
+        $('.graphview_loading').html('NO RESULTS FOUND').show();
+    }
+    $('.graphview_searchable').bind('click',addtosearch);
+    setTimeout(hidepagination, 500);
+}
+
+var template = function() {
+    var options = $.fn.graphview.options;
+    var ui = '<div class="graphview">';
+    ui += '<div class="row graphview_searcharea">';
+    ui += '<div class="col-md-12">';
+    ui += '<input type="text" class="form-control query_string" style="width:97%; data-option="query.bool.must.query_string.query" placeholder="search">';
+    ui += '</div>';
+    ui += '<div class="col-md-12" style="margin-top:10px;margin-bottom:5px;">';
+	ui += '<a href="#" class="graphview_prev btn btn-info" style="margin-top:-4px;"><</a> ';
+    ui += '<input class="form-control graphview_from" type="text" value="';
+    ui += options.defaultquery.from;
+    ui += '" style="width:40px;margin:-5px 0 0 0;padding:1px 1px 0 0;color:#666;text-align:center;display:inline;">';
+    ui += ' to ';
+    ui += '<input class="form-control graphview_to" type="text" value="';
+    ui += options.defaultquery.size;
+    ui += '" style="width:40px;margin:-5px 0 0 0;padding:1px 1px 0 0;color:#666;text-align:center;display:inline;"> of \
+        <span class="graphview_total" style="font-size:16px;font-weight:bold;color:#999;"></span>';
+	ui += ' <a href="#" class="graphview_next btn btn-info" style="margin-top:-4px;">></a>';
+    ui += ' <span class="graphview_loading">... LOADING</span>';
+    
+    ui += '<a href="#" id="fullscreen">fs</a>'
+    
+    ui += '</div>';
+    ui += '</div>'; // closes searcharea
+    ui += '<div class="graphview_panel"></div>';
+    ui += '</div>'; // closes graphview
+
+    return ui;
+}
+
+var full = false;
+var parent = '';
+var fullscreen = function(event) {
+    event.preventDefault();
+    if ( full ) {
+        $('.graphview').prependTo(parent);
+        $('.graphview').css({
+            background: 'none',
+            position:'static',
+            "z-index": 1,
+            height: '100%',
+            width: '100%'
+        })
+        full = false;
+    } else {
+        parent = $('.graphview').parent();
+        $('.graphview').prependTo('body');
+        $('.graphview').css({
+            position:'absolute',
+            background: 'white',
+            top: '5px',
+            left: '5px',
+            bottom: '5px',
+            right: '5px',
+            "z-index": 100000000
+        })
+        full = true;
+    }
+}
+
+$('#searchresults').graphview({
+    "target": "https://elastic.cottagelabs.com/catalogue/_search",
+    "pushstate": false,
+    "defaultquery": {
+        "query": {
+            "bool": {
+                "must":[
+                    {"match_all": {}}
+                ]
+            }
+        },
+        "from":0,
+        "size":25
+    },
+    searchhintline: "start typing search terms to see suggestions. Select a suggestion or continue typing a search term, then click enter to search",
+    showresults: showresults,
+    uitemplate: template
+});
+    
+$('#fullscreen').bind('click', fullscreen);
+
+    
+});
+</script>
+	
+	
+	
+	
+	
+	
+	
+</body>
+</html>

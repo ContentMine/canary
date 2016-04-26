@@ -9,6 +9,10 @@ It is a node.js meteor app that uses mongodb for backend storage and can also se
 
 NOTE: this code remains at an early stage, and is not yet well structured (I was learning whilst building it). The next commit is likely to see quite a re-structuring and separation of configs etc now that I know node and meteor better.
 
+How Canary works:
+
+https://docs.google.com/drawings/d/1mQZBw7nmg2IrooN9ZmQgfvzCmNRu8zOuCm-tKLfWlWM/edit
+
 
 Install
 =======

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Endangered Species | ContentMine</title>
+    <meta name="description" content="">
+    <meta name="author" content="Cottage Labs">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript" src="http://static.cottagelabs.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="http://static.cottagelabs.com/bootstrap-3.0.3/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://static.cottagelabs.com/bootstrap-3.0.3/css/bootstrap.min.css">
+    
+    <script type="text/javascript" src="http://static.cottagelabs.com/holder/jquery.holder.js"></script>
+    <!--
+    <script type="text/javascript" src="http://static.cottagelabs.com/holder/lib/d3/d3.min.js"></script>
+    <script type="text/javascript" src="http://static.cottagelabs.com/holder/views/network.js"></script>
+    -->
+
+</head>
+<!--
+<body style="background-color:#92ce73;margin-top:80px;background-repeat:no-repeat;background-size:100%;background-position:left top;background-image:url('http://static.cottagelabs.com/CM_small.png');">
+-->
+<body style="background-color:#92ce73;">    
+      
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+              <h1><a href="/">ContentMine Endangered Species example (in progress)</a></h1>
+              <p>Search the <a target="_blank" href="http://www.iucnredlist.org">IUCN endangered species red list</a>. 
+              Narrow down by taxa or search by common names.
+              Find the endangered species you are interested in, then we will check if any recent research articles have mentioned it. 
+              We currently check PLOS and BMC journals, since August 2015 (this is a demo, we are already increasing our coverage). 
+              If we find anything we can show you the recent research on the species in question,
+              and provide a workspace for further examination of the relevant articles. (Try Ursus maritimus for a good example.)</p>
+                <div class="panel panel-default holder holder-ui" style="border-color:#187c83;border-width:3px;">
+                    <div class="panel-heading" style="background-color:white;padding:0px;">
+                        <div class="input-group" style="margin-left:-1px;margin-top:-1px;margin-bottom:-6px;margin-right:-2px;">
+                            <div class="input-group-btn">
+                                <button class="btn btn-default holder holder-function" holder-function="prev" alt="previous" title="previous" style="height:50px;font-size:1.6em;"><</button>
+                            </div>
+                            <input type="text" class="form-control holder holder-search holder-function" holder-function="suggest" placeholder="search..." style="font-size:1.6em;height:50px;">
+                            <div class="input-group-btn">
+                                <button class="btn btn-default holder holder-toggle" holder-toggle="options" alt="show/hide search options" title="show/hide search options" style="height:50px;font-size:1.6em;">: :</button>
+                                <button class="btn btn-default holder holder-function" holder-function="next" alt="next" title="next" style="height:50px;font-size:1.6em;">></button>
+                            </div>
+                        </div>
+                        <div class="holder holder-filters" style="margin-top:5px;"></div>
+                    </div>
+                    <div class="panel-body section holder holder-options">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="holder holder-suggestions"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+              <h2 class="header-selectors" id="header-kingdom">Kingdom</h2>
+              <div class="holder holder-kingdom"></div>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+              <h2 class="header-selectors" id="header-phylum">Phylum</h2>
+              <div class="holder holder-phylum"></div>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+              <h2 class="header-selectors" id="header-class">Class</h2>
+              <div class="holder holder-class"></div>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+              <h2 class="header-selectors" id="header-order">Order</h2>
+              <div class="holder holder-order"></div>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+              <h2 class="header-selectors" id="header-family">Family</h2>
+              <div class="holder holder-family"></div>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+              <h2 class="header-selectors" id="header-genus">Genus</h2>
+              <div class="holder holder-genus"></div>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+              <h2 class="header-selectors" id="header-species">Species</h2>
+              <div class="holder holder-species"></div>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12" style="margin-top:10px;">
+                <div class="holder holder-results" style="height:100%;overflow:scroll;"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12" style="margin-top:10px;">
+                <div id="relatedfacts"></div>
+            </div>
+        </div>
+    </div>
+<script>
+jQuery(document).ready(function() {
+  
+    var showfacts = function(resp) {
+        var disp = '';
+        if ( resp.hits.total == 0 ) {
+            disp += '<p>Sorry, we could find no new facts about this species. We are increasing coverage, and would love to <a href="mailto:contact@contentmine.org" target="_blank">hear from you</a> if you want to suggest priority areas.</p>';
+        } else {
+            disp += '<p>Below are the most recent ' + resp.hits.total + ' relevant facts that we have found, along with information about and links to the articles in which the facts were discovered.</p>'
+            disp += '<p>We are increasing coverage, and would love to <a href="mailto:contact@contentmine.org" target="_blank">hear from you</a> if you want to suggest priority areas, or how we could pick out the most relevant activity in the published literature.</p>';
+            disp += '<table class="table table-striped table-bordered" style="background-color:white;">';
+            for ( var i in resp.hits.hits ) {
+                var f = resp.hits.hits[i]._source;
+                disp += '<tr>';
+                disp += '<td><p>' + f.pre + ' <span style="color:#187c83;font-size:1.1em;">' + f.fact + '</span> ' + f.post + '</p></td>';
+                disp += '<td><p>in <a target="_blank" href="' + f.url + '">' + f.title + '</a></p></td>';
+                disp += '</tr>';
+            }
+            disp += '</table>';
+        }
+        $('#relatedfacts').html(disp);
+        $('html, body').animate({
+            scrollTop: $("#relatedfacts").offset().top - 20
+        }, 500);
+    }
+ 
+    var getfacts = function(event,th) {
+        if (th === undefined) th = $(this);
+        var s = th.text();
+        var qry = { 
+            "query": {"filtered": {"filter": {"query": {"bool":{"must":[{"query_string":{"query":s}}]}}}}},
+            "size": 200,
+            "sort": [{"set.exact": {"order": "desc"}}]
+        };
+        $.ajax({
+            url: 'http://api.contentmine.org/query/facts?source=' + encodeURIComponent(JSON.stringify(qry)),
+            type: 'GET',
+            dataType: 'JSON',
+            success: showfacts
+        });        
+    }
+
+    $(document).on('click', 'a.getfacts', function(event) { event.preventDefault(); getfacts(event,$(this)); } );
+
+    
+    var result = function(data) {
+        var details = '<div class="col-md-3">';
+        details += '<div class="well" style="padding:5px;height:280px;overflow:hidden;border-color:#187c83;border-width:3px;background-color:#fff;color:#92ce73;">';
+        details += '<p style="font-size:1em;">';
+        details += '<a style="color:#187c83;font-weight:bold;font-size:1.4em;" class="getfacts" href="#">' + data.genus + ' ' + data.species + '</a>';
+        details += '</p>';
+        details += '<p>';
+        for ( var ri in data.common_names_eng ) {
+            details += searchify({class: 'holder', val: data.common_names_eng[ri], attrs: {function: 'add', filter: 'common_names_eng.exact', value: data.common_names_eng[ri]} });
+            if ( ri !== data.common_names_eng.length-1 ) { details += ', '; }
+        }
+        details += '</p>';
+        details += '<p>';
+        for ( var rr in data.synonyms ) {
+            details += searchify({class: 'holder', val: data.synonyms[rr], attrs: {function: 'add', filter: 'synonyms.exact', value: data.synonyms[rr]} });
+            if ( ri !== data.synonyms.length-1 ) { details += ', '; }
+        }
+        details += '</p>';
+        details += '<p style="font-size:0.8em;color:black;">Assessed: ';
+        details += searchify({class: 'holder', val: data.year_assessed, attrs: {function: 'add', filter: 'year_assessed.exact', value: data.year_assessed} });
+        details += '<br>Status: ';
+        details += searchify({class: 'holder', val: data.red_list_status, attrs: {function: 'add', filter: 'red_list_status.exact', value: data.red_list_status} });
+        details += '<br>Population trend: ';
+        details += searchify({class: 'holder', val: data.population_trend, attrs: {function: 'add', filter: 'population_trend.exact', value: data.population_trend} });
+        details += '<br>Petitioned: ';
+        details += searchify({class: 'holder', val: data.petitioned, attrs: {function: 'add', filter: 'petitioned.exact', value: data.petitioned} });
+        details += '<br>Authority: ';
+        details += searchify({class: 'holder', val: data.authority, attrs: {function: 'add', filter: 'authority.exact', value: data.authority} });
+        details += '</p>';
+        details += '</div>';
+        details += '</div>';    
+        return details;
+    }
+    var results = function(data) {
+        var disp = '<div class="row">';
+        for ( var r in data.hits.hits ) {
+            disp += result(data.hits.hits[r]['_source']);
+        }
+        disp += '</div>';
+        $('.holder.holder-results').html(disp);
+    }
+    
+    var suggestions = function(data) {
+        if (data === undefined) data = options.response;
+        if ( $('.holder').holder.options.query.aggregations['common_names.exact'] !== undefined ) {
+          var disp = '';
+          for ( var r in data.aggregations['common_names.exact'].buckets ) {
+              var j = data.aggregations['common_names.exact'].buckets[r];
+              disp += '<p>';
+              disp += searchify({class: 'holder', val: j.key, attrs: {function: 'add', filter: 'common_names.exact', value: j.key} });
+              disp += '</p>';
+          }
+          $('.holder.holder-suggestions').html(disp);
+        }
+        $('.header-selectors').each(function() {
+          $(this).text( $(this).text().split(' ')[0] );
+        });
+        var lastselect = false;
+        var selectors = ['kingdom','phylum','class','order','family','genus'];
+        for ( var f in selectors ) { //$('.holder').holder.options.query.aggregations ) {
+            var fn = selectors[f];
+            var ft = fn + '.exact';
+            if ( $('.holder').holder.options.query.aggregations[ft] !== undefined ) {
+              var disp = '';
+              if ( data.aggregations[ft].buckets.length == 1 ) {
+                $('#header-' + fn).text( $('#header-' + fn).text() + ' ' + data.aggregations[ft].buckets[0].key );
+              } else if ( !lastselect) {
+                lastselect = true;
+                for ( var r in data.aggregations[ft].buckets ) {
+                    var j = data.aggregations[ft].buckets[r];
+                    disp += '<div class="well" style="padding:5px;height:140px;width:140px;overflow:hidden;border-color:#187c83;border-width:3px;background-color:#fff;font-size:0.9em;position:relative;float:left;margin:5px;">';
+                    disp += '<div style="position:relative;top:20px;left:0;z-index:1;font-size:3em;font-weight:bold;">';
+                    disp += searchify({class: 'holder', val: '<span style="color:#92ce73;">' + j.doc_count + '</span>', attrs: {function: 'add', filter: ft, value: j.key} });
+                    disp += '</div>';
+                    disp += '<div style="position:absolute;top:5px;left:5px;z-index:2;width:90px;word-wrap:break-word;">';
+                    disp += searchify({class: 'holder', val: j.key, attrs: {function: 'add', filter: ft, value: j.key} });
+                    disp += '</div>';
+                    disp += '</div>';
+                }                
+              }
+              $('.holder.holder-' + fn).html(disp);
+            }
+        }
+    };
+
+    var sz = 100;
+    $('body').holder({
+        "what": "search red list species",
+        "url": "https://elastic.cottagelabs.com/contentmine/redlist/_search",
+        "datatype": "JSON",
+        "results": {
+            "default": results,
+            "suggestions": suggestions
+        },
+        "size": sz,
+        "aggregations": {
+            "family.exact": { "terms": { "field": "family.exact", "size": sz } },
+            //"authority.exact": { "terms": { "field": "authority.exact", "size": sz } },
+            "common_names.exact": { "terms": { "field": "common_names_eng.exact", "size": sz } },
+            "synonyms.exact": { "terms": { "field": "synonyms.exact", "size": sz } },
+            "phylum.exact": { "terms": { "field": "phylum.exact", "size": sz } },
+            "species.exact": { "terms": { "field": "species.exact", "size": sz } },
+            //"red_list_status.exact": { "terms": { "field": "red_list_status.exact", "size": sz } },
+            //"year_assessed.exact": { "terms": { "field": "year_assessed.exact", "size": sz } },
+            //"petitioned.exact": { "terms": { "field": "petitioned.exact", "size": sz } },
+            "kingdom.exact": { "terms": { "field": "kingdom.exact", "size": sz } },
+            //"red_list_criteria.exact": { "terms": { "field": "red_list_criteria.exact", "size": sz } },
+            "class.exact": { "terms": { "field": "class.exact", "size": sz } },
+            "order.exact": { "terms": { "field": "order.exact", "size": sz } },
+            // these ones are always empty
+            //"stock_subpopulation.exact": { "terms": { "field": "stock_subpopulation.exact", "size": sz } },
+            //"infraspecific_rank.exact": { "terms": { "field": "infraspecific_rank.exact", "size": sz } },
+            //"infraspecific_name.exact": { "terms": { "field": "infraspecific_name.exact", "size": sz } },
+            //"infraspecific_authority.exact": { "terms": { "field": "infraspecific_authority.exact", "size": sz } },
+            "genus.exact": { "terms": { "field": "genus.exact", "size": sz } },
+            //"population_trend.exact": { "terms": { "field": "population_trend.exact", "size": sz } }
+        }
+    }); 
+
+    setTimeout(function() {$('.holder-options').hide(); }, 200);
+});
+</script>
+        
+
+</body>
+</html>

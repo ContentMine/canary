@@ -1,4 +1,30 @@
 
+// what would we want to do in a new canary?
+
+// api.cottagelabs.com/catalogue
+// find articles people want to work on. So we do our daily crawls anyway.
+// people search for an article in OUR set. If we don't have it, we let them provide some.
+
+// api.cottagelabs.com/tdm/getfulltext/html,xml,txt,pdf
+// given any URL, map it to a fulltext SOMEHOW (also oabutton submission)
+// so create a index of URLs. 
+// Given PMID or PMCID or DOI or any other sort of ID that we have a way of dereferencing, do it.
+// then for any URL have a way of going from the URL to a fulltext link
+// Some easy way to look at any web page and determine if it IS the full content, or if it LINKS to full content?
+// a simplified journal-scraper?
+// and a mapping of URLs to related APIs from where we could retrieve fulltexts instead
+// and then, if behind paywall, pass call to machine running within a walled garden to process and return facts (NOT the articles)
+// what would appear in a web page to indicate there was a link to other formats, or that this page is the fulltext?
+// how many ways could that be done? Look for them all?
+// For URL that cannot be accessed, email the author
+// content preference order: html, xml, txt, pdf
+
+// The above will also rely on 
+// api.cottagelabs.com/store
+
+
+
+
 // some good test articles
 // http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0137925	has species
 // http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0008887	has human genes
@@ -37,10 +63,10 @@ if ( runlocal ) {
 // TODO should these two remote ones also prefix the canarysetid with some sort of local machine or IP URL address?
 // if running locally but also sending to remote, where are the remote endpoints to send to
 var remotefactsindexurl = function(canarysetid) {
-    return 'http://api.contentmine.org/sets/' + canarysetid + '/facts/receive';
+    return 'http://api.contentmine.co/sets/' + canarysetid + '/facts/receive';
 };
 var remotemetadataindexurl = function(canarysetid) {
-    return 'http://api.contentmine.org/sets/' + canarysetid + '/metadata/receive';
+    return 'http://api.contentmine.co/sets/' + canarysetid + '/metadata/receive';
 };
 
 // which AMI processes should be run when processing
@@ -329,16 +355,16 @@ if (Meteor.isServer) {
         // check the mdpi list of journals and see if any are in epmc http://www.mdpi.com/about/journals
         var qry = 'FIRST_PDATE:' + dts + ' AND (JOURNAL:plos* OR JOURNAL:bmc*)';
         Meteor.call('getPapers', qry, ts);
-        console.log('Created daily set and populated with getpapers results');
+        console.log('Created set and populated with getpapers results');
         for ( var i in availableProcesses ) {
             Meteor.call('process', {
                 processor: availableProcesses[i],
                 canarysetid: ts
             });
         }
-        console.log('Processed daily set with available processes');
+        console.log('Processed set with available processes');
         Meteor.call('loadFacts', ts );
-        console.log('Facts loaded for daily set');
+        console.log('Facts loaded for set');
     };
     
 	SyncedCron.add({
@@ -376,7 +402,7 @@ This is equivalent to an elasticsearch _search endpoint, and returns elasticsear
 Our mapping stores exact string terms for term matching in field keys suffixed with .exact.<br> \
 The simplest way to find keys to search or aggregate on is to just look at the objects in the result sets.<br> \
 Straightforward parameters are q=searchstring&size=10&from=0. q can handle wildcards and logic and key specifications, such as q=fact.exact:"fact" AND set:*setnam~<br> \
-Here is an example query URL: <a href="http://api.contentmine.org/query/facts?q=*&size=5&from=0">http://api.contentmine.org/query/facts?q=*&size=5&from=0</a><br> \
+Here is an example query URL: <a href="http://api.contentmine.co/query/facts?q=*&size=5&from=0">http://api.contentmine.co/query/facts?q=*&size=5&from=0</a><br> \
 See elasticsearch docs at <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html</a> for more information on how to query the API <br><br> \
                 '
             };
@@ -565,10 +591,10 @@ Meteor.methods({
 		var sd = articledir(url);
 		var input = 'fulltext.xml';
 		// TODO: if there is no fulltext.xml in the directory, look for a fulltext.html or fulltext.pdf
-        // if there is a pdf set the xsl as pdf2html and set the input to the pdf filename
-        // if there is an html file don't use the xsl, but set --html jsoup and the filename is the html filename
-        // eventually the html output of jsoup - which is actually giving xhtml - should be passed through a stylesheet to shtml
-        // if no html or pdf, but there is an xml that is not called fulltext.xml, set the input as that instead
+		// if there is a pdf set the xsl as pdf2html and set the input to the pdf filename
+		// if there is an html file don't use the xsl, but set --html jsoup and the filename is the html filename
+		// eventually the html output of jsoup - which is actually giving xhtml - should be passed through a stylesheet to shtml
+		// if no html or pdf, but there is an xml that is not called fulltext.xml, set the input as that instead
 		var xsl = 'nlm2html';
         if ( url.indexOf('biomedcentral') !== -1 ) xsl = 'bmc2html';  
 		// or xsl could also be bmc2html or hind2xml
@@ -590,14 +616,14 @@ Meteor.methods({
 		var sd = articledir(url);
 		console.log('preparing to retrieve ' + url + ' to ' + sd);
 		if ( !fs.existsSync(sd) ) {
-            var urlexists = acheck200(url);
-            if ( urlexists ) {
-    			var meta = athresh(sd, url);
-	    		console.log('thresher finished');        
-            } else {
-	    		console.log('url does not seem to exist - removing from set');                
+			var urlexists = acheck200(url);
+			if ( urlexists ) {
+				var meta = athresh(sd, url);
+				console.log('thresher finished');        
+			} else {
+				console.log('url does not seem to exist - removing from set');                
 				Meteor.call('addFailToSet', url, canarysetid);
-            }
+			}
 			// if fulltext.html not retrieved, try to get the url directly
 			if ( !fs.existsSync(sd + 'fulltext.html') && urlexists ) {
 				console.log('no fulltext.html present so retrieving directly');
@@ -617,16 +643,16 @@ Meteor.methods({
 				// try to normalise the retrieved content
 				Meteor.call('normalise', url, canarysetid);
 			}
-            try {
-                if (meta.date.published) meta.published_date = meta.date.published.split('T')[0] + ' 0100';
-                delete meta.sections;
-                delete meta.date;
-                delete meta.log;
-                Meteor.call('indexMetadata',meta);                
-            } catch(err) {}
+			try {
+					if (meta.date.published) meta.published_date = meta.date.published.split('T')[0] + ' 0100';
+					delete meta.sections;
+					delete meta.date;
+					delete meta.log;
+					Meteor.call('indexMetadata',meta);                
+			} catch(err) {}
 		} else {
 			// we already have this url, if a canarysetid was provided then copy it over
-            console.log("article at URL " + url + " is already in store");
+			console.log("article at URL " + url + " is already in store");
 			if ( canarysetid ) {
 				Meteor.call('addArticleToSet', url, canarysetid);
 			}

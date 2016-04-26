@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>ContentMine Facts</title>
+    <meta name="description" content="the ContentMine Facts catalogue">
+    <meta name="author" content="mark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- get jquery -->
+    <script type="text/javascript" src="http://static.cottagelabs.com/jquery-1.10.2.min.js"></script>
+
+     <!-- get jquery-ui -->
+    <link rel="stylesheet" href="http://static.cottagelabs.com/jquery-ui-1.10.3.custom/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
+    <script type="text/javascript" src="http://static.cottagelabs.com/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
+
+    <!-- get bootstrap -->
+    <link rel="stylesheet" href="http://static.cottagelabs.com/bootstrap-3.0.3/css/bootstrap.min.css">
+    <script type="text/javascript" src="http://static.cottagelabs.com/bootstrap-3.0.3/js/bootstrap.min.js"></script>
+
+    <!-- get d3 -->
+    <script type="text/javascript" src="http://static.cottagelabs.com/d3/d3.min.js"></script>
+    
+    <!-- get select2 -->
+    <script type="text/javascript" src="http://static.cottagelabs.com/select2-release-3.2/select2.min.js"></script>
+    <link rel="stylesheet" href="http://static.cottagelabs.com/select2-release-3.2/select2.css">
+    <link rel="stylesheet" href="http://static.cottagelabs.com/select2-release-3.2/select2-bootstrap.css">
+
+    <!-- get graphview -->
+    <script type="text/javascript" src="http://static.cottagelabs.com/jquery.graphview.js"></script>
+    
+    <style>
+    .graphview_panel{
+        font-size:0.9em;
+    }
+    </style>
+</head>
+
+
+<body>
+
+<!--
+<div class="container" style="margin-top:10px;">
+    <div class="panel panel-default" id="searchfeedback">
+        <div class="panel-heading" style="background-color:white;padding:0px;">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchbox">
+                <div class="input-group-btn">
+                    <button class="btn btn-default" id="showallthesearchoptions" alt="show/hide search options" title="show/hide search options"><i class="glyphicon glyphicon-cog"></i></button>
+                </div>
+            </div>
+            <div id="chosentags" style="margin-top:5px;"></div>
+        </div>
+        <div class="panel-body section" id="allthesearchoptions">
+            <div id="searchingquestions" class="col-md-4" style="border-right:1px solid #ccc;"></div>
+            
+            <div class="col-md-2" id="searchingtags" style="border-right:1px solid #ccc;"></div>
+
+            <div class="col-md-2" id="searchingkeywords" style="border-right:1px solid #ccc;"></div>
+
+            <div class="col-md-2" id="searchinggroups" style="border-right:1px solid #ccc;"></div>
+            
+            <div class="col-md-2" id="searchingoptions">
+                <p>Graph settings:</p>
+                <p><input type="checkbox" class="vissetting" id="showtags" checked="checked"> show tags</p>
+                <p><input type="checkbox" class="vissetting" id="showentities" checked="checked"> show entities</p>
+                <p><input type="checkbox" class="vissetting" id="showanswers"> show answers</p>
+                            
+            </div>    
+
+        </div>
+    </div>
+</div>
+-->
+    
+	
+	<div class="container-fluid wrapper-header-first" style="background-color:white;border-bottom:4px solid #92ce73;margin-bottom:10px;">
+		<div class="container header-first">
+			<div class="navbar-header col-xs-12 col-sm-12 col-lg-4">
+				<a class="navbar-brand" href="http://contentmine.org/" alt="Return to the ContentMine website" title="Return to the ContentMine website"><img src="http://contentmine.org/wp-content/themes/sage_contentmine-manual.org/assets/images/logo-web.png" style="height:100%;margin-left:-20px;"></a>
+			</div>
+			<nav class="col-xs-12 col-sm-12 col-lg-8" role="navigation">
+				<ul class="nav navbar-nav">
+					<li style="margin-right:50px;"><h2>BUBBLES</h2></li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+		
+    <div class="container-fluid">    
+		<div class="row">
+			<div class="col-md-12">
+				<div id="searchresults" style="width:100%;height:600px;">
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+<script>
+    
+(function($) {
+    $.fn.bindWithDelay = function( type, data, fn, timeout, throttle ) {
+        var wait = null;
+        var that = this;
+
+        if ( $.isFunction( data ) ) {
+            throttle = timeout;
+            timeout = fn;
+            fn = data;
+            data = undefined;
+        }
+
+        function cb() {
+            var e = $.extend(true, { }, arguments[0]);
+            var throttler = function() {
+                wait = null;
+                fn.apply(that, [e]);
+            };
+
+            if (!throttle) { clearTimeout(wait); }
+            if (!throttle || !wait) { wait = setTimeout(throttler, timeout); }
+        }
+
+        return this.bind(type, data, cb);
+    };
+})(jQuery);
+
+jQuery(document).ready(function() {
+
+var unique = function(a) {
+    for(var i=0; i<a.length; ++i) {
+        for(var j=i+1; j<a.length; ++j) {
+            if(a[i] === a[j])
+                a.splice(j--, 1);
+        }
+    }
+    return a;
+};
+
+function resultrecord(data) {
+    var details = '<div class="col-md-4">';
+    details += '<div class="well" style="padding:5px;height:280px;overflow:hidden;border-color:#187c83;border-width:3px;background-color:#fff;color:#92ce73;">';
+    details += '<p style="font-size:1em;">' + data.pre;
+    details += ' <a target="_blank" href="#" style="color:#187c83;font-weight:bold;font-size:1.2em;">' + data.fact + '</a> ';
+    details += data.post + '</p>';
+    details += '<p style="font-size:0.8em;color:black;">' + data.processor + '<br>' + data.url + '</p>';
+    details += '</div>';
+    details += '</div>';    
+    return details;
+}
+
+var addtosearch = function(event) {
+    event.preventDefault();
+    // could also get the data type if it is added to the link syntax
+    var val = $(this).text();
+    var vals = $('.query_string').select2("val");
+    if ( vals.indexOf(val) === -1 ) { vals.push(val); }
+    $('.query_string').select2("val", vals);
+    $('.query_string').trigger('change');
+}
+var showresults = function(data) {
+    var restable = '<div class="row">';
+    for ( var r in data.hits.hits ) {
+        restable += resultrecord(data.hits.hits[r]._source);
+    }
+    restable += '</div>';
+    $('.graphview_panel').html(restable);
+    $('.graphview_total').html(data.hits.total);
+    $('.graphview_loading').html('... LOADING').hide();
+    if ( data.hits.total == 0 ) {
+        $('.graphview_loading').html('NO RESULTS FOUND').show();
+    }
+    $('.graphview_searchable').bind('click',addtosearch);
+}
+
+var template = function() {
+    var options = $.fn.graphview.options;
+    var ui = '<div class="graphview">';
+    ui += '<div class="row graphview_searcharea">';
+    ui += '<div class="col-md-12">';
+    ui += '<input type="text" class="form-control query_string" style="width:97%; data-option="query.bool.must.query_string.query" placeholder="search">';
+    ui += '</div>';
+    ui += '<div class="col-md-12" style="margin-top:10px;margin-bottom:5px;">';
+	ui += '<a href="#" class="graphview_prev btn btn-info" style="margin-top:-4px;"><</a> ';
+    ui += '<input class="form-control graphview_from" type="text" value="';
+    ui += options.defaultquery.from;
+    ui += '" style="width:40px;margin:-5px 0 0 0;padding:1px 1px 0 0;color:#666;text-align:center;display:inline;">';
+    ui += ' to ';
+    ui += '<input class="form-control graphview_to" type="text" value="';
+    ui += options.defaultquery.size;
+    ui += '" style="width:40px;margin:-5px 0 0 0;padding:1px 1px 0 0;color:#666;text-align:center;display:inline;"> of \
+        <span class="graphview_total" style="font-size:16px;font-weight:bold;color:#999;"></span>';
+	ui += ' <a href="#" class="graphview_next btn btn-info" style="margin-top:-4px;">></a>';
+    ui += ' <span class="graphview_loading">... LOADING</span>';
+    
+    ui += '</div>';
+    ui += '</div>'; // closes searcharea
+    ui += '<div class="graphview_panel"></div>';
+    ui += '</div>'; // closes graphview
+
+    return ui;
+}
+
+
+$('#searchresults').graphview({
+    "target": "https://elastic.cottagelabs.com/contentmine/fact/_search",
+    "pushstate": false,
+    "searchhintline": "type search terms and click enter to search",
+    "titlefield": "fact", 
+    "defaultquery": {
+        "query": {
+            "bool": {
+                "must":[
+                    {"match_all": {}}
+                ]
+            }
+        },
+        "from":0,
+        "size":100,
+        "facets":{
+            "pre": {"term":{"field":"pre","suggest":true, "node":true}},
+            //"exact": {"term":{"field":"exact.exact","suggest":true, "node": true}},
+            //"match": {"term":{"field":"match.exact","suggest":true, "node": true}},
+            "post": {"term":{"field":"post","suggest": true, "node": true}},
+            //"name": {"term":{"field":"name.exact","suggest": true, "node": true}},
+            "fact": {"term":{"field":"fact.exact","suggest": true, "node": true}},
+            "set": {"term":{"field":"set.exact","suggest": true, "node": true}},
+            "processor": {"term":{"field":"processor.exact","suggest": true, "node": true}},
+            "url": {"term":{"field":"url.exact","suggest": true, "node": true}},
+            "title": {"term":{"field":"title.exact","suggest": true, "node": true}},
+            "author": {"term":{"field":"author.name.exact","suggest": true, "node": true}}
+        }
+    },
+    "routepartialmatch": 5,
+    "nodesize": 100
+    //"showresults": showresults,
+    //"uitemplate": template
+});
+    
+});
+</script>
+	
+	
+	
+	
+	
+	
+	
+</body>
+</html>

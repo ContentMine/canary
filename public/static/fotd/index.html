@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Fact of the day | ContentMine</title>
+    <meta name="description" content="">
+    <meta name="author" content="Cottage Labs">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript" src="http://static.cottagelabs.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="http://static.cottagelabs.com/bootstrap-3.0.3/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://static.cottagelabs.com/bootstrap-3.0.3/css/bootstrap.min.css">
+    
+    <script type="text/javascript" src="http://static.cottagelabs.com/holder/jquery.holder.js"></script>
+
+    <style> <!-- style for bar chart exampe -->
+    .holder-chart text {
+        fill: white;
+        font: 10px sans-serif;
+        text-anchor: end;
+    }
+    </style>
+
+    <script src="http://crypto-js.googlecode.com/svn/tags/3.0.2/build/rollups/md5.js"></script>
+</head>
+
+<body style="background-repeat:no-repeat;background-size:100%;background-position:left top;background-image:url('http://static.cottagelabs.com/CM_small.png');">
+
+    <div style="position:absolute;top:5px;right:5px;">
+        <div class="well" style="padding-bottom:5px;">
+            <h1 id="popularfact" style="margin-top:0px;color:#187c83;">Loading...</h1>
+            <p>is the ContentMine Fact Of The Day for <b class="set"></b>.
+                <br>It is the most popular species, human gene, or DNA
+                <br>sequence found in papers published in PLOS and BMC.
+                <br>On this day it features <span id="popularfactcount" style="font-weight:bold;color:#187c83;">XX</span> times in <span id="popularfactpapers" style="font-weight:bold;color:#187c83;">XX</span> papers.</p>
+            <p style="text-align:center;">
+                <a id="prev" href="" class="btn btn-xs btn-default">previous day fact</a> 
+                <a id="next" href="" class="btn btn-xs btn-default" style="margin-left:30px;">next day fact</a> 
+                <a href="" class="btn btn-xs btn-default" style="margin-left:30px;" id="more">more info</a>
+            </p>
+        </div>
+        <div id="moreinfo" style="display:none;padding:10px;background:white;">
+            <p>
+                A <a target="_blank" href="http://contentmine.org">ContentMine</a> project service. 
+                Funded by the <a target="_blank" href="https://www.shuttleworthfoundation.org/">Shuttleworth Foundation</a>.<br>
+                Using the <a target="_blank" href="https://europepmc.org/">EuropePMC</a> API to retrieve articles from 
+                <a target="_blank" href="https://www.plos.org/">PLOS</a> and 
+                <a target="_blank" href="http://biomedcentral.org/">BMC</a>.<br>
+                Displaying images from <a target="_blank" href="https://en.wikipedia.org/wiki/Main_Page">Wikipedia</a> where available.<br>
+                Running at <a target="_blank" href="http://cottagelabs.com">Cottage Labs</a>. 
+                <a target="_blank" href="mailto:us@cottagelabs.com">Contact us</a> if errors.
+            </p>
+        </div>
+    </div>
+
+    
+<script>
+jQuery(document).ready(function() {
+    $('body').css({'height': $(window).height() + 'px'});
+        
+    var wpimgurl = 'https://upload.wikimedia.org/wikipedia/commons/';
+    var showwp = function(resp) {
+        var first = true;
+        var ky = '';
+        for ( var nm in resp.query.pages ) {
+            if (first) ky = nm; first = false;
+        }
+        var img = resp.query.pages[ky].pageprops.page_image;
+        var imghash = CryptoJS.MD5(img).toString();
+        var url = wpimgurl + imghash.charAt(0) + '/' + imghash.charAt(0) + imghash.charAt(1) + '/' + img;
+        if ( img === undefined ) {
+            $('body').prepend('<div id="sorry" style="background:white;padding:5px;"><p>Sorry! There is no nice image for this fact.<br>We get them from Wikimedia Commons.<br>Perhaps if you have a nice image, you could go to Wikipedia and search for this fact,<br>and update the page with a picture!<br>Or add a page about if there is not one already!</p><div id="statements"></div></div>');
+            $('body').css({'background-image': 'url("http://static.cottagelabs.com/CM_small.png")'});            
+        } else {
+            $('body').css({'background-image': 'url("' + url + '")'});
+        }
+    }
+    var getwp = function(fact) {
+        $.ajax({
+            url: 'https://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(fact) + '&prop=pageprops&format=json',
+            type: 'POST',
+            dataType: 'JSONP',
+            success: showwp
+        })
+    }
+        
+    var less = 5;
+    var dated = function( delim, less ) {
+        if ( delim === undefined ) delim = '';
+        if ( less === undefined ) less = 5;
+        var date = new Date();
+        if ( less ) date.setDate(date.getDate() - less);
+        var dd = date.getDate();
+        var mm = date.getMonth()+1;
+        var yyyy = date.getFullYear();
+        if ( dd<10 ) dd = '0'+dd;
+        if ( mm<10 ) mm = '0'+mm;
+        return yyyy + delim + mm + delim + dd;
+    };
+    var sn = 'daily' + dated(undefined, less);
+    if ( $.getUrlVar('s') ) {
+        sn = $.getUrlVar('s');
+        var date = new Date();
+        var st = sn.replace('daily','');
+        var sty = st.slice(0,4);
+        var stm = st.slice(4,6);
+        stm = stm - 1;
+        var std = st.slice(6,8);
+        var stdd = new Date(sty,stm,std);
+        var diff = Math.abs(stdd.getTime() - date.getTime());
+        less = Math.ceil(diff / (1000 * 3600 * 24)) - 1;
+    }
+
+    var showpapers = function(resp) {
+        var popularfactpapers = resp.aggregations["url.exact"].buckets.length;
+        $('#popularfactpapers').html(popularfactpapers);
+        var statements = '<h1 style="color:white;">';
+        for ( var i in resp.hits.hits ) {
+            var f = resp.hits.hits[i]._source;
+            statements += f.pre + ' ' + f.fact + ' ' + f.post + '<br>';
+        }
+        statements += '</h1>';
+        console.log(statements);
+        $('#statements').html(statements);
+    };
+    var getpapercount = function(fact) {
+        var qr = { 
+            "query": {"filtered": {"filter": {"bool": {"must": [ {"term": {"fact.exact":fact}}, {"term": {"set.exact":sn}} ]}}}},
+            "size": 1,
+            "aggregations": {"url.exact": { "terms": { "field": "url.exact", "size": 10000 } }}
+        };
+        $.ajax({
+            url: 'http://api.contentmine.org/query/facts?source=' + encodeURIComponent(JSON.stringify(qr)),
+            type: 'GET',
+            dataType: 'JSON',
+            success: showpapers
+        });
+    };
+    var showfact = function(resp) {
+        try {
+            var popularfact = resp.aggregations["fact.exact"].buckets[0].key;
+            var popularfactcount = resp.aggregations["fact.exact"].buckets[0].doc_count;
+            $('#popularfact').html(popularfact);
+            $('#popularfactcount').html(popularfactcount);
+            getpapercount(popularfact);
+            getwp(popularfact);            
+        } catch(err) {
+            console.log('Probably no fact today');
+            $('#popularfact').html("None! Try the day before");
+        }
+    }
+
+    var getfact = function() {
+        $('#sorry').remove();
+        $('#popularfact').html('Loading...');
+        $('#popularfactcount').html('XX');
+        $('#popularfactpapers').html('XX');
+        $('body').css({
+            'background-image': 'url("http://static.cottagelabs.com/CM_small.png")'
+        })
+        $('.set').html(sn.replace('daily',''));
+        console.log(sn);
+        var qry = { 
+            "query": {"filtered": {"filter": {"term": {"set.exact":sn}}}},
+            "size": 0,
+            "aggregations": {"fact.exact": { "terms": { "field": "fact.exact", "size": 1 } }}
+        };
+        $.ajax({
+            url: 'http://api.contentmine.org/query/facts?source=' + encodeURIComponent(JSON.stringify(qry)),
+            type: 'GET',
+            dataType: 'JSON',
+            success: showfact
+        });        
+    }
+    setTimeout(getfact, 1000);
+    
+    $('#prev').bind('click',function(e) { 
+        e.preventDefault(); 
+        less += 1; 
+        sn = 'daily' + dated(undefined,less); 
+        if ('pushState' in window.history) window.history.pushState("", "s", '?s=' + sn);
+        getfact(); 
+    });
+    $('#next').bind('click',function(e) { 
+        e.preventDefault(); 
+        less -= 1; 
+        sn = 'daily' + dated(undefined,less); 
+        if ('pushState' in window.history) window.history.pushState("", "s", '?s=' + sn);
+        getfact(); 
+    });
+        
+    $('#more').bind('click',function(e) {
+        e.preventDefault();
+        $('#moreinfo').toggle();
+    });
+});
+</script>
+        
+    
+    
+<script>
+    /*var imgsz;
+    function findHHandWW() {
+        imgsz = this.height * this.width;return true;
+        console.log(imgsz);
+    }
+    function showImage(imgPath) {
+        var myImage = new Image();
+        myImage.name = imgPath;
+        myImage.onload = findHHandWW;
+        myImage.src = imgPath;
+        $('body').append(myImage);
+    }
+    var wpfact = undefined;
+    var wpimgurl = 'https://upload.wikimedia.org/wikipedia/commons/';
+    var showwp = function(resp) {
+        var first = true;
+        var ky = '';
+        for ( var nm in resp.query.pages ) {
+            if (first) ky = nm; first = false;
+        }
+        var theimg = false;
+        for ( var im in resp.query.pages[ky].images ) {
+            var img = resp.query.pages[ky].images[im].title.replace('File:','');
+            if (img.indexOf(wpfact) !== -1) theimg = img;
+        }
+        if ( !theimg ) {
+            for ( var im in resp.query.pages[ky].images ) {
+                var img = resp.query.pages[ky].images[im].title.replace('File:','');
+                if ( img.indexOf('jpg') !== -1 || img.indexOf('jpeg') !== -1 || img.indexOf('png') !== -1) {
+                    theimg = img;
+                    theimg = theimg.replace(/ /g,'_');
+                    var imghash = CryptoJS.MD5(theimg).toString();
+                    var url = wpimgurl + imghash.charAt(0) + '/' + imghash.charAt(0) + imghash.charAt(1) + '/' + encodeURIComponent(theimg);
+                    console.log(url);
+                    showImage(url);
+                }
+            }            
+        }
+        $('body').css({
+            'background-image': 'url("' + wpimgurl + '")'
+        })
+        console.log(wpimgurl);
+        console.log(imgsz);
+    }
+    var getwp = function(fact) {
+        wpfact = fact;
+        $.ajax({
+            url: 'https://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(fact) + '&prop=images&format=json',
+            type: 'POST',
+            dataType: 'JSONP',
+            success: showwp
+        })
+    }*/
+    
+    /*
+    var showwdata = function(wdr) {
+        // turns out wikidata is fairly useless...
+        //console.log(wdr);
+    }
+    var getwdobj = function(wdresp) {
+        var wd = wdresp.items[0];
+        $.ajax({
+            url: 'https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q' + wd + '&format=json',
+            type: 'POST',
+            dataType: 'JSONP',
+            success: showwdata
+        });
+    }
+    var getwd = function(fact) {
+        $.ajax({
+            url: 'http://wdq.wmflabs.org/api?q=string[225:"' + fact + '"]',
+            type: 'POST',
+            dataType: 'JSONP',
+            success: getwdobj
+        })
+    }
+    */
+
+</script>
+
+</body>
+</html>

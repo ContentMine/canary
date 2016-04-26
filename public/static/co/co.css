@@ -1,0 +1,34 @@
+/* CM light green is #92ce73 and dark green is #187c83 */
+
+.container-fluid {
+  max-width:1200px;
+  margin:0 auto 0 auto;
+}
+.label-cm {
+  font-size:0.9em;
+  background-color:#ddd;
+  color:#333;
+}
+.btn-cm {
+  background-color:#187c83;
+  font-weight:bold;
+  color:#333;
+}
+.well-cm {
+  background-repeat:no-repeat;
+  background-size:100%;
+  background-position:center top;
+  background-color:white;
+  border:3px solid #187c83;
+  min-height:270px;
+  padding-bottom:5px;
+}
+.well-cm-lg {
+  min-height:520px;
+}
+.well-cm-dark {
+  background-color:#187c83;
+}
+.well-cm-light {
+  background-color:#92ce73;
+}

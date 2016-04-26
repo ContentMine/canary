@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Facts | ContentMine</title>
+  <meta name="description" content="">
+  <meta name="author" content="Cottage Labs">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <script type="text/javascript" src="http://static.cottagelabs.com/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript" src="http://static.cottagelabs.com/bootstrap-3.0.3/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="http://static.cottagelabs.com/bootstrap-3.0.3/css/bootstrap.min.css">
+    
+  <script type="text/javascript" src="http://static.cottagelabs.com/holder/jquery.holder.js"></script>
+
+ 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+  <!-- CM light green is #92ce73 and dark green is #187c83 -->
+  <style>
+    .label-cm {
+      font-size:0.9em;
+      background-color:#ddd;
+      color:#333;
+    }
+    .btn-cm {
+      background-color:#187c83;
+      font-weight:bold;
+      color:#333;
+    }
+    .well-cm {
+      background-repeat:no-repeat;
+      background-size:100%;
+      background-position:center top;
+      background-color:white;
+      border:3px solid #187c83;
+      min-height:270px;
+      padding-bottom:5px;
+    }
+    .well-cm-lg {
+      min-height:520px;
+    }
+    .well-cm-dark {
+      background-color:#187c83;
+    }
+    .well-cm-light {
+      background-color:#92ce73;
+    }
+  </style>
+
+</head>
+
+	
+<body>
+
+  <div class="container" style="margin-top:50px;width:1200px;">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="well well-cm">
+          <a href="http://contentmine.co"><img src="http://static.cottagelabs.com/CM_small.png" style="padding-top:50px;padding-bottom:10px;width:100%;"></a>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="well well-cm">
+					<p>
+						<!--<a href="http://contentmine.co" class="btn btn-xs btn-default btn-block">User page / sign up</a>-->
+						<a href="http://facts.contentmine.co" class="btn btn-xs btn-primary btn-block">FACTS</a>
+						<a href="http://fotd.contentmine.co" class="btn btn-xs btn-default btn-block">Fact of the day</a>
+						<a href="http://redlist.contentmine.co" class="btn btn-xs btn-default btn-block">IUCN redlist</a>
+						<a href="http://bubbles.contentmine.co" class="btn btn-xs btn-default btn-block">Research networks</a>
+						<a href="http://contentmine.org" class="btn btn-xs btn-default btn-block">ContentMine project blog</a>
+					</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="well well-cm well-cm-light">
+					<h3>ContentMine FACTS</h3>
+					<p>We extract facts from PLOS and BMC on a daily basis.</p>
+				</div>
+      </div>
+    </div>
+  </div>
+
+	<div class="container" style="margin-top:20px;width:1200px;">
+		<div class="panel panel-default holder holder-ui" style="margin:0px;">
+			<div class="panel-heading" style="background-color:white;padding:0px;">
+				<div class="input-group" style="margin-left:-1px;margin-top:-1px;margin-bottom:-6px;margin-right:-2px;">
+						<!--<div class="input-group-btn">
+								<a href="/" class="btn btn-default holder holder-toggle" holder-toggle="options" alt="show/hide search options" title="show/hide search options" style="height:50px;"><i style="margin-top:3px;" class="fa fa-cog fa-2x"></i></a>
+						</div>-->
+						<input type="text" class="form-control holder holder-search holder-function" holder-function="suggest" placeholder="search..." style="font-size:1.6em;height:50px;">
+						<div class="input-group-btn">
+								<a href="/" class="btn btn-default" alt="clear all search terms and reset" title="clear all search terms and reset" style="height:50px;"><i style="margin-top:3px;" class="fa fa-remove fa-2x"></i></a>
+						</div>
+				</div>
+				<div class="holder holder-filters" style="margin-top:5px;"></div>
+			</div>
+			<div class="panel-body section holder holder-options">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="holder holder-suggestions"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+    
+	<div class="container" style="margin-top:20px;width:1200px;">
+			<div class="row">
+					<div class="col-md-12" style="margin-top:10px;">
+							<div class="holder holder-results" style="height:100%;overflow:scroll;"></div>
+					</div>
+			</div>
+	</div>
+
+  <div class="holder holder-loading" style="position:fixed;bottom:5px;left:0;right:0;width:100%;z-index:1000;background-color:white;">
+    <div class="container" style="width:1200px;">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="jumbotron">
+            <h1 style="text-align:center;">FACTS ARE LOADING</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+jQuery(document).ready(function() {
+        
+    var result = function(data) {
+        var details = '<div class="col-md-3">';
+        details += '<div class="well" style="padding:5px;height:280px;overflow:hidden;border-color:#187c83;border-width:3px;background-color:#fff;color:#92ce73;">';
+        details += '<p style="font-size:1em;">' + data.pre + ' ';
+        var sp = '<span style="color:#187c83;font-weight:bold;font-size:1.4em;">' + data.fact + '</span>';
+        details += searchify({class: 'holder', val: sp, attrs: {function: 'add', filter: 'fact.exact', value: data.fact} });
+        details += ' ' + data.post + '</p>';
+        details += '<p style="font-size:0.8em;color:black;">Processor: ';
+        details += searchify({class: 'holder', val: data.processor, attrs: {function: 'add', filter: 'processor.exact', value: data.processor} });
+        details += '<br>Set: ';
+        details += searchify({class: 'holder', val: data.set, attrs: {function: 'add', filter: 'set.exact', value: data.set} });
+        details += '<br>Author(s): ';
+        for ( var ri in data.author ) {
+            details += searchify({class: 'holder', val: data.author[ri].name, attrs: {function: 'add', filter: 'author.name.exact', value: data.author[ri].name} });
+            if ( ri !== data.author.length-1 ) { details += ', '; }
+        }
+        details += '</p>';
+        details += '</div>';
+        details += '</div>';    
+        return details;
+    }
+    var results = function(data) {
+        var disp = '<div class="row holder holder-innerresults">';
+        for ( var r in data.hits.hits ) {
+            disp += result(data.hits.hits[r]['_source']);
+        }
+        disp += '</div>';
+        $('.holder.holder-results').html(disp);
+    }
+
+    var scroll = function(data) {
+        for ( var r in data.hits.hits ) {
+            $('.holder.holder-innerresults').append(result(data.hits.hits[r]['_source']));
+        }
+    }
+
+    var suggestions = function(data) {
+        if (data === undefined) data = options.response;
+        $('.holder.holder-suggestions').html('');
+			  var disp = '<div class="row">';
+        for ( var f in $('.holder').holder.options.query.aggregations ) {
+					  var nm = f.replace('.exact','').toUpperCase();
+					  disp += '<div class="col-md-';
+					  if ( nm === 'PROCESSOR' ) disp += "2";
+					  if ( nm === 'AUTHOR.NAME' ) { disp += "3"; nm = 'AUTHOR'; }
+					  if ( nm === 'SET' ) disp += "3";
+					  if ( nm === 'TITLE' ) disp += "4";
+            disp += '"><h3>' + nm + '</h3><p>';
+            for ( var r in data.aggregations[f].buckets ) {
+                var j = data.aggregations[f].buckets[r];
+                disp += searchify({class: 'holder', val: j.key + ' (' + j.doc_count + ')<br>', attrs: {function: 'add', filter: f, value: j.key} });
+            }
+            disp += '</p></div>';
+        }
+			  disp += '</div>';
+        $('.holder.holder-suggestions').append(disp);
+    };
+
+    
+    var sz = 75;
+    $('body').holder({
+        "what": "",
+        "url": "http://api.contentmine.co/query/facts",
+			  "scroll": true,
+        "datatype": "JSON",
+        "results": {
+            "default": results,
+					  "scroll": scroll,
+            "suggestions": suggestions
+        },
+        "size": 20,
+        "aggregations": {
+            "processor.exact": { "terms": { "field": "processor.exact", "size": sz } },
+            "author.name.exact": { "terms": { "field": "author.name.exact", "size": sz } },
+            "set.exact": { "terms": { "field": "set.exact", "size": sz } },
+            "title.exact": { "terms": { "field": "title.exact", "size": sz } }
+        }
+    }); 
+
+    setTimeout(function() {$('.holder-options').hide(); }, 200);
+
+});
+</script>
+        
+    
+</body>
+</html>
