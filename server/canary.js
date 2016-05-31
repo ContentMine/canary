@@ -83,33 +83,14 @@ API.addRoute('', {
 	}
 });
 API.addRoute('etl/:dailyset', {
+	// dailyset form should be like 2016-06-01
 	post: function() {
 		etl(this.urlParams.dailyset);
 		return '';
 	}
 });
 // facts - actually use nginx to configure a direct ES search route safely
-API.addRoute('facts/daily/:date', {
-	get: function() {
-		return {}; // TODO query the facts index for all facts on date
-	}
-});
-API.addRoute('facts/:ident', {
-	get: function() {
-		return {}; // TODO query the facts index for all facts from a given ident, like an article URL or DOI, perhaps
-	}
-});
 // catalogue - again use ES to configure a safe direct ES search onto catalogue METADATA (so store fulltext in separate index)
-API.addRoute('catalogue/daily/:date', {
-	get: function() {
-		return {}; // TODO query the catalogue for everything indexed on given date
-	}
-});
-API.addRoute('catalogue/:ident', {
-	get: function() {
-		return {}; // TODO query the catalogue for everything for a given ident, like perhaps a journal ID or something...
-	}
-});
 API.addRoute('retrieve', {
 	get: function() {
 		return {}; // TODO given a URL as query param, retrieve the content of the URL into the system somehow... could also accept data on POST
