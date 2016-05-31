@@ -26,19 +26,21 @@ var query = function(qry,from,size,set,index) {
   if (size === undefined) size = 100;
   if (index === undefined) index = 'facts';
   // filter queries are much faster, but cannot get highlight matches out of them - so use standard queries
+  // https://www.elastic.co/guide/en/elasticsearch/reference/1.4/search-request-highlighting.html
   var qr = {
-    query: {
-    },
-    highlight: {
+    query: {},
+    from: from,
+    size:size
+  }
+  if (index !== 'facts') {
+    qr.highlight = {
       fields: {
         text:{
           fragment_size:200,
           number_of_fragments:200 // this is a max
         }
       }
-    },
-    from: from,
-    size:size
+    }
   }
   if (qry.indexOf('/') === 0) {
     // https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-regexp-filter.html
