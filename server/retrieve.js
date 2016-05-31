@@ -5,20 +5,15 @@ import * as moment from 'moment';
 
 // =====================================================================================
 // FUNCTIONS TO CHECK AND RETRIEVE URLS AND READ FROM GETPAPERS / QUICKSCRAPE / THRESHER OUTPUT
-var retrieve = function(url, canarysetid) {
-	var sd = articledir(url);
+var retrieve = function(url, dailyset) {
+	var sd = storedir + '/' + dailyset + '/' + uid(url);
+	fs.mkdirSync(sd);
 	console.log('preparing to retrieve ' + url + ' to ' + sd);
-	var meta;
-	if ( !fs.existsSync(sd) ) {
-		var urlexists = acheck200(url);
-		if ( urlexists ) {
-			meta = athresh(sd, url);
-			console.log('thresher finished');        
-		} else {
-			console.log('url does not seem to exist - removing from set');
-		}
+	var urlexists = acheck200(url);
+	if ( urlexists ) {
+		athresh(sd, url); // if quickscrape/thresher is throwing lots of errors, wrap this in a try/catch
 		// if fulltext.html not retrieved, try to get the url directly
-		if ( !fs.existsSync(sd + 'fulltext.html') && urlexists ) {
+		if ( !fs.existsSync(sd + '/fulltext.html') ) {
 			console.log('no fulltext.html present so retrieving directly');
 			// TODO add code here that would look in the source URL for links that may go to the fulltext
 			// because often the source URL is a splash page. Also grab any cookies presented by the source URL
@@ -26,38 +21,27 @@ var retrieve = function(url, canarysetid) {
 			Meteor.http.call('GET', url, function(sth,res) {
 				// save the file to the url folder
 				var nm = url.split('/')[-1];
-				var fnm = sd + nm;
+				var fnm = sd + '/' + nm;
 				fs.writeFileSync(fnm, res);
 				console.log('file ' + nm + ' retrieved directly and saved to set');
-				// if there is no fulltext.html but there is some other html, copy it to fulltext.html
-				// if there is no html but there is a pdf, convert it to text, 
-				// then convert that to scholarly.html and skip norma - and probably log that we are cludging...
-				// try to normalise the retrieved content
-				normalise(url, canarysetid); // TODO only IF we are running norma. Probably make this a config option
+				// TODO if there is no fulltext.html but there is some other html, copy it to fulltext.html
+				// TODO if there is now a fulltext.html, extract the text of it out into a file called fulltext.txt
+				// TODO if there is no html but there is a pdf or an xml, keep originals but also convert it to text into a file called fulltext.txt
 			});
-		} else if ( urlexists ) {
-			// TODO try to normalise the retrieved content, if normalising is supposed to run
-			// if doing this, and if known the article is open, could go in a folder to be shared publicly
-			normalise(url, canarysetid);
+		} else {
+			// TODO extract fulltext.html out to fulltext.txt
 		}
-		try {
-			if (meta.date.published) meta.published_date = meta.date.published.split('T')[0] + ' 0100';
-			delete meta.sections;
-			delete meta.date;
-			delete meta.log;
-		} catch(err) {}
+		return true;
 	} else {
-		// we already have this url, if a canarysetid was provided then copy it over
-		console.log("article at URL " + url + " is already in store");
+		return true;
 	}
-	return meta;
 }
 
-var getPapers = function(searchstr, canarysetid) {
+var getPapers = function(searchstr, dailyset) {
 	// TODO update this to call the latest version of getpapers, and to call it with the query 
 	// for whichever sources we want URLs for. IF POSSIBLE, have getpapers return the result URLs
 	// directly instead of having to read them from disk
-	var sd = setdir(canarysetid);
+	var sd = storedir + '/' + dailyset;
 	console.log('running getpapers for query ' + searchstr);
 	var api = 'eupmc'; // should be crossref, and maybe also eupmc if desirable
 	var cmd = "getpapers --query '" + searchstr + "' --outdir " + sd; // + ' --all';
@@ -129,7 +113,6 @@ var acheck200 = Async.wrap(check200);
 
 // various processing functions called by the meteor methods during processing
 var thresh = function(sd, url, callback) {
-	fs.mkdirSync(sd);
 	process.chdir(sd);
 	// try to quickscrape / thresher the urls
 	var scrapers = new thresher.ScraperBox(scraperdir);
@@ -146,6 +129,7 @@ var thresh = function(sd, url, callback) {
 		t = null;
 		callback(null,true);
   });
+	// TODO what and how to return on failure of getting a result? Should return false
 	t.scrape(url, true);
 };
 var athresh = Async.wrap(thresh);

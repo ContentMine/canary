@@ -1,12 +1,21 @@
 
-import * as xml2js from 'xml2js';
+//import * as xml2js from 'xml2js';
+
+/* var availableProcesses = ['species','gene','sequence']; // only needed if running AMI processes, as is regexdir below
+var regexdir = function(regex) { // needed by ami
+	return userdir + '/dev/contentmine/src/ami-regexes/' + regex + '.xml';
+};
+var setarticledir = function(dailyset,url) { // needed for AMI
+	return setdir(dailyset) + uid(url) + '/';
+};*/
+
 
 // =====================================================================================
 // THE FUNCTIONS BELOW HERE ARE OLD ONES THAT CAN RUN AMI AND TRAVERSE
 // AMI CPROJECT OUTPUT DIRECTORIES FOR RESULTS FILES THAT IT THEN 
 // TRANSLATES AND FORMATS AS BIBJSON
 var process = function(params) {
-	console.log('beginning process ' + params.processor + ' for ' + params.canarysetid);
+	console.log('beginning process ' + params.processor);
 	for ( var u in params.urls ) {
 		var url = params.urls[u];
 		if ( url.processed.indexOf(params.processor) == -1 || params.rerun) {
@@ -48,7 +57,7 @@ var process = function(params) {
 			var sds = sd + 'results/' + params.processor.replace('-','/') + '/';
 		}
 	}
-	console.log('process ' + params.processor + ' finished for ' + params.canarysetid);
+	console.log('process ' + params.processor + ' finished');
 }
 
 var readFacts = function(sd) {

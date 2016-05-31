@@ -1,7 +1,11 @@
 
+/*var articledir = function(url) { // needed for norma
+	return userdir + '/cm/articles/' + uid(url) + '/';
+};*/
+
 // =====================================================================================
 // THE OLD FUNCTION TO RUN NORMA TO NORMALISE RETRIEVED CONTENT
-var normalise = function(url, canarysetid) {
+var normalise = function(url) {
 	console.log('about to normalise ' + url);
 	var sd = articledir(url);
 	var input = 'fulltext.xml';
@@ -20,6 +24,9 @@ var normalise = function(url, canarysetid) {
 	console.log('norma finished');
 	if ( !fs.existsSync(sd + 'scholarly.html') ) {
 		console.log('norma did not succeed');
+		return false;
+	} else {
+		return true;
 	}
 }
 

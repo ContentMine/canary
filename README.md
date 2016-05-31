@@ -43,9 +43,20 @@ Code Structure
 ==============
 
 Canary is only a server-side app, even though it is written in meteor which can do server and client side. Externally, it exposes 
-an API that can be connected to from remote services. The main code is in canary.js, which defines settings, the API endpoints, and 
-the daily cron activities. normalise.js contains code that can do or that can execute normalisation to scholarly html. process.js 
-can execute other processes on the article content to extract facts, for example by calling AMI. retrieve.js retrieves content from 
-remote APIs and sites, via quickscrape / thresher / getpapers, or simply direct http requests to URLs.
+an API that can be connected to from remote services. 
+
+The main code is in canary.js, which defines settings and the API endpoints. 
+
+cron.js defines the daily jobs that run to retrieve and process articles on a daily basis, extracting facts and saving them to the 
+index each day. The cron functions make use of the other functions, although the API can also call them directly in some cases, if 
+necessary. 
+
+index.js contains the code that can query and submit data to the elasticsearch indexes. 
+
+normalise.js contains code that can do or that can execute normalisation to scholarly html. 
+
+process.js can execute other processes on the article content to extract facts, for example by calling AMI. 
+
+retrieve.js retrieves content from remote APIs and sites, via quickscrape / thresher / getpapers, or simply direct http requests to URLs.
 
 
