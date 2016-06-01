@@ -60,10 +60,9 @@ var extract = function(dailyset,dicts) {
             } else {
               fact.match = match; // TODO on custom queries this may need to be better represented            
             }
-            for ( var k in dictrow ) {
-              fact[k] = dictrow[k];
-            }
+            for ( var k in dictrow ) fact[k] = dictrow[k];
             fact.set = dailyset;
+						fact.dictionary = dictname;
             // TODO check where these values are actually put in the processing index records
             // NOTE we don't want the entire record bc it would contain the fulltext and perhaps other things we don't want permanently related to the fact
             fact.url = res.url;

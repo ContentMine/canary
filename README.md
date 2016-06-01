@@ -33,8 +33,6 @@ If you want to have your own index running, install elasticsearch too (https://w
 Configure
 =========
 
-NOTE: this is all early stage, and not ideally setup for configuration...
-
 At the top of the canary.js file there are various options that can be set. It is best to check directly there to ensure 
 you are seeing the most up to date possibilities.
 
@@ -58,5 +56,26 @@ normalise.js contains code that can do or that can execute normalisation to scho
 process.js can execute other processes on the article content to extract facts, for example by calling AMI. 
 
 retrieve.js retrieves content from remote APIs and sites, via quickscrape / thresher / getpapers, or simply direct http requests to URLs.
+
+
+Dictionaries
+============
+
+The extract section of the daily functions expects to be able to read a folder full of dictionary files. These SHOULD be JSON files named 
+something like species.json and they should contain a JSON list of objects. Each object must have at least a "query" key, and that key 
+should point to either a simple string to match exactly on, or a regex starting with /, or an object that is a full "query" part of an 
+elasticsearch query.
+
+It would also be possible to allow dictionaries in .xml and then convert them to the same structure, and also to allow .txt files that just 
+contain a list of strings or regexes. However, neither of these capabilities have been added to the cron/extract function yet, althouth they 
+easily could be.
+
+When a fact is discovered, any keys present in the match object will be added to the fact, and the name of the dictionary file (without the 
+filetype suffix) will be used to identify which dictionary matched the fact.
+
+
+
+
+
 
 
