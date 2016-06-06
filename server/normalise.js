@@ -1,13 +1,9 @@
 
-/*var articledir = function(url) { // needed for norma
-	return userdir + '/cm/articles/' + uid(url) + '/';
-};*/
-
 // =====================================================================================
 // THE OLD FUNCTION TO RUN NORMA TO NORMALISE RETRIEVED CONTENT
-var normalise = function(url) {
-	console.log('about to normalise ' + url);
-	var sd = articledir(url);
+var normalise = function(folder) {
+	console.log('about to normalise ' + folder);
+	var sd = folder; // TODO once normalise is called again, need to decide how actually to point it at a folder
 	var input = 'fulltext.xml';
 	// TODO: if there is no fulltext.xml in the directory, look for a fulltext.html or fulltext.pdf
 	// if there is a pdf set the xsl as pdf2html and set the input to the pdf filename

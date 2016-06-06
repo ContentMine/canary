@@ -115,7 +115,7 @@ var acheck200 = Async.wrap(check200);
 var thresh = function(sd, url, callback) {
 	process.chdir(sd);
 	// try to quickscrape / thresher the urls
-	var scrapers = new thresher.ScraperBox(scraperdir);
+	var scrapers = new thresher.ScraperBox(Meteor.settings.scraperdir);
 	var t = new thresher.Thresher(scrapers);
 	t.once('result', function(result, structured) {
 		// no longer need to read the metadata from thresher output, we will already have it from the API

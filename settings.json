@@ -1,0 +1,9 @@
+{
+  "runcron": true,
+  "normalise": false,
+  "indexurl": "http://gateway:9200",
+  "userdir": "/home/cloo",
+  "storedir": "/home/cloo/store",
+  "dictsdir": "/home/cloo/dev/contentmine/src/dictionaries",
+  "scraperdir": "/home/cloo/dev/contentmine/src/journal-scrapers/scrapers/"
+}

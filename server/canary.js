@@ -4,15 +4,6 @@ import exec from 'child_process';
 import {XMLHttpRequest as xmhtrq} from 'xmlhttprequest';
 
 
-// ========================================================================================
-// CONFIGURE THE MAIN SETTINGS HERE
-var runcron = true;
-var normalise = false;
-var indexurl = 'http://gateway:9200';
-var userdir = '/home/cloo';
-var storedir = userdir + '/store';
-var dictsdir = userdir + '/dev/contentmine/src/dictionaries';
-var scraperdir = userdir + '/dev/contentmine/src/journal-scrapers/scrapers/'; // needed by thresher / quickscrape
 
 
 

@@ -27,6 +27,10 @@ cd canary
 
 meteor
 
+If you want to use a settings file, like the example one provided, and/or set the port to run on, run with a command like this:
+
+meteor --port 3123 --settings settings.json
+
 If you want to have your own index running, install elasticsearch too (https://www.elastic.co/)
 
 

@@ -54,7 +54,7 @@ var query = function(qry,from,size,set,index) {
     // https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-term-filter.html
     qr.query.term = {text:qry};
   }
-  var qrl = indexurl + '/' + index + '/';
+  var qrl = Meteor.settings.indexurl + '/' + index + '/';
   if (set) qrl += set + '/';
   qrl += '_search';
   return Meteor.http.call('POST',qrl,{data:qr}).data;
@@ -74,7 +74,7 @@ var bulkload = function(records,route,create) {
     }
 		bulk += JSON.stringify( records[i] ) + '\n';
 	}
-	var frl = indexurl + route + '/_bulk';
+	var frl = Meteor.settings.indexurl + route + '/_bulk';
 	var xhr = new xmhtrq();
 	xhr.open('POST', frl, true);
 	xhr.send(bulk);
