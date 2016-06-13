@@ -1,12 +1,45 @@
+recursive=require('recursive-readdir')
+var elasticsearch = require('elasticsearch');
+import * as _ from 'lodash'
+path=require('path')
+import * as fs from 'fs'
+import {XMLHttpRequest as xmhtrq} from 'xmlhttprequest';
 
 // =====================================================================================
 // FUNCTIONS TO GET CONTENT INTO THE INDEX
+// recursively looks through a given folder to upload eupmc_result.json contents
+// to elastic search
+var ESClient = function () {
+	var client = new elasticsearch.Client({
+		host: Meteor.settings.elastichost+':'+Meteor.settings.elasticport
+	})
+	return client
+}
+
+var uploadJSONFileToES =  function (file, index, type, client) {
+	fs.readFile(file, function (err, data) {
+		client.create({
+			index: index,
+			type: type,
+			body: JSON.parse(data)
+		})
+	})
+}
+
+var indexEuPMCMetadata = function(folder) {
+	var client = ESClient()
+	console.log(folder)
+	recursive(folder, function(err, files) {
+		files.forEach(function (file) {
+	    if(path.basename(file)=="eupmc_result.json") {
+	    uploadJSONFileToES(file, 'metadata', 'eupmc', client)
+	    }
+	  })
+	})
+}
+
 var indexMetadata = function(dailyset) {
-	console.log('uploading metadata to catalogue');
-  // TODO use fs to read a list of every folder in the dailyset directory
-  // for every folder in there, look in it for the metadata, if that is where the retrieve operation put them
-  // this depends on what we find out about getpapers and the metadata returned by the query
-  var metadata = [];
+	indexEuPMCMetadata(Meteor.settings.storedir + '/' + dailyset)
   // for every metadata record, use the folder name (the URL uid) as the _id for the record
   bulkload(metadata,'/catalogue/'+dailyset,true);
   var mdwithflattext = [];
@@ -17,7 +50,7 @@ var indexMetadata = function(dailyset) {
     // if the fulltext was found, then mdwithflattext.push(metadata[m])
   }
   if (mdwithflattext.length > 0) bulkload(mdwithflattext,'/flat/'+dailyset,true);
-  // if norma processing is enabled, and structured fulltext can also be found in a scholarly.html file, 
+  // if norma processing is enabled, and structured fulltext can also be found in a scholarly.html file,
   // then the loop above could also popualte the mdwithstructuredtext array, and that too could be bulkloaded to '/structured/'+dailyset
 }
 
@@ -46,7 +79,7 @@ var query = function(qry,from,size,set,index) {
     // https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl-regexp-filter.html
     qr.query.regexp = {text:qry};
   } else if (typeof qry === 'object') {
-    // allows to pass any query in. There are many highly customisable query types that ES could handle, 
+    // allows to pass any query in. There are many highly customisable query types that ES could handle,
     // and these could be passed straight in from dicts with query pointing to full query objects (if they are in json this would be easy)
     // read ES docs https://www.elastic.co/guide/en/elasticsearch/reference/1.4/query-dsl.html and/or ask MM
     qr.query = qry;
@@ -78,6 +111,8 @@ var bulkload = function(records,route,create) {
 	var xhr = new xmhtrq();
 	xhr.open('POST', frl, true);
 	xhr.send(bulk);
-	console.log(records.length + ' records sent to ' + route);  
+	console.log(records.length + ' records sent to ' + route);
 }
 
+module.exports.indexMetadata = indexMetadata
+module.exports.bulkload = bulkload

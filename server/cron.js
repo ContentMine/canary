@@ -1,22 +1,29 @@
+import * as fs from 'fs'
+retrieve = require('./retrieve.js')
+index = require('./index.js')
 
 // ========================================================================================
 // THE DAILY FUNCTIONS TO RETRIEVE AND PROCESS ARTICLES EACH DAY
 var etl = function(dailyset) {
   var dts = dailyset ? dailyset : dated(delim='-');
-  fs.mkdirSync(Meteor.settings.storedir + '/' + dts);
+  if(!fs.existsSync(Meteor.settings.storedir + '/' + dts)) {
+    fs.mkdirSync(Meteor.settings.storedir + '/' + dts);
+  }
   // TODO update to indexed (NOT published date) date query for crossref and eupmc (this is possible, but need to know how getpapers expects that)
 	var qry = 'FIRST_PDATE:' + dts + ' AND (JOURNAL:plos* OR JOURNAL:bmc*)';
-	var urls = getPapers(qry, dts); // TODO we somehow need the metadata returned by getpapers for each URL too
+	var urls = retrieve.getpapers(qry, dts); // TODO we somehow need the metadata returned by getpapers for each URL too
+  /*
 	for ( var i in urls ) {
-		var retrieved = retrieve(urls[i], dts); // this creates a dir inside dts dir, named after the uid of the url
+		var retrieved = retrieve.retrieve(urls[i], dts); // this creates a dir inside dts dir, named after the uid of the url
     if (retrieved) {
       if (Meteor.settings.normalise) {
         // TODO here we would call norma, to normalise the fulltext.html file if there is one in the
       }
-      indexMetadata(dailyset);
     }
 	}
-  extract(dailyset);
+  */
+  index.indexMetadata(dailyset);
+  //extract(dailyset);
 };
 
 var extract = function(dailyset,dicts) {
@@ -58,7 +65,7 @@ var extract = function(dailyset,dicts) {
                 fact.post = '';
               }
             } else {
-              fact.match = match; // TODO on custom queries this may need to be better represented            
+              fact.match = match; // TODO on custom queries this may need to be better represented
             }
             for ( var k in dictrow ) fact[k] = dictrow[k];
             fact.set = dailyset;
@@ -85,3 +92,5 @@ SyncedCron.add({
 	job: function() { etl(); }
 });
 if (Meteor.settings.runcron) SyncedCron.start();
+
+module.exports.etl = etl

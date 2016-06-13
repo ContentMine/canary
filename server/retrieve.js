@@ -2,18 +2,23 @@
 import * as request from 'request';
 import * as thresher from 'thresher';
 import * as moment from 'moment';
+import * as child_process from 'child_process';
+import fs from 'fs'
+mark = require('./markscommon.js')
 
 // =====================================================================================
 // FUNCTIONS TO CHECK AND RETRIEVE URLS AND READ FROM GETPAPERS / QUICKSCRAPE / THRESHER OUTPUT
 var retrieve = function(url, dailyset) {
-	var sd = storedir + '/' + dailyset + '/' + uid(url);
-	fs.mkdirSync(sd);
+	var sd = Meteor.settings.storedir + '/' + dailyset + '/' + mark.uid(url);
+	if(!fs.existsSync(sd)) {
+		fs.mkdirSync(sd);
+	}
 	console.log('preparing to retrieve ' + url + ' to ' + sd);
 	var urlexists = acheck200(url);
-	if ( urlexists ) {
+	if ( urlexists  && Meteor.settings.downloadPapers ) {
 		athresh(sd, url); // if quickscrape/thresher is throwing lots of errors, wrap this in a try/catch
 		// if fulltext.html not retrieved, try to get the url directly
-		if ( !fs.existsSync(sd + '/fulltext.html') ) {
+		if ( !fs.existsSync(sd + '/fulltext.html')) {
 			console.log('no fulltext.html present so retrieving directly');
 			// TODO add code here that would look in the source URL for links that may go to the fulltext
 			// because often the source URL is a splash page. Also grab any cookies presented by the source URL
@@ -21,7 +26,7 @@ var retrieve = function(url, dailyset) {
 			Meteor.http.call('GET', url, function(sth,res) {
 				// save the file to the url folder
 				var nm = url.split('/')[-1];
-				var fnm = sd + '/' + nm;
+				var fnm = sd + '/' + 'fulltext.html';
 				fs.writeFileSync(fnm, res);
 				console.log('file ' + nm + ' retrieved directly and saved to set');
 				// TODO if there is no fulltext.html but there is some other html, copy it to fulltext.html
@@ -38,20 +43,20 @@ var retrieve = function(url, dailyset) {
 }
 
 var getPapers = function(searchstr, dailyset) {
-	// TODO update this to call the latest version of getpapers, and to call it with the query 
+	// TODO update this to call the latest version of getpapers, and to call it with the query
 	// for whichever sources we want URLs for. IF POSSIBLE, have getpapers return the result URLs
 	// directly instead of having to read them from disk
-	var sd = storedir + '/' + dailyset;
+	var sd = Meteor.settings.storedir + '/' + dailyset;
 	console.log('running getpapers for query ' + searchstr);
 	var api = 'eupmc'; // should be crossref, and maybe also eupmc if desirable
 	var cmd = "getpapers --query '" + searchstr + "' --outdir " + sd; // + ' --all';
-	var child = aexec(cmd);
+	var child = mark.aexec(cmd);
 	var urls = geturls(sd, api);
 	return urls;
 }
 
 var geturls = function(sd, api) {
-	var fln = sd + api + '_results.json';
+	var fln = sd + '/' + api + '_results.json';
 	console.log('Reading urls from ' + fln);
 	var urls = [];
 	var jsn = JSON.parse(fs.readFileSync(fln, 'utf8'));
@@ -91,7 +96,7 @@ var resolve = function(url, callback) {
 		if ( res === undefined ) {
 			callback(null, url);
 		} else {
-			callback(null, res.request.uri.href);        
+			callback(null, res.request.uri.href);
 		}
 	});
 };
@@ -107,7 +112,7 @@ var check200 = function(url, callback) {
 		} else {
 			callback(null, false);
 		}
-	});    
+	});
 };
 var acheck200 = Async.wrap(check200);
 
@@ -284,3 +289,6 @@ var format = function(t) {
 
   return x;
 };
+
+module.exports.getpapers = getPapers
+module.exports.retrieve = retrieve
