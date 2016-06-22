@@ -12,7 +12,8 @@
     "request": "2.61.0",
     "thresher": "0.1.5",
     "xml2js": "0.4.9",
-    "xmlhttprequest": "1.7.0"
+    "xmlhttprequest": "1.7.0",
+    "agentkeepalive": "~2.1.1"
   },
   "devDependencies": {}
 }

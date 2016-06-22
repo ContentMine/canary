@@ -4,9 +4,9 @@
   "indexurl": "http://localhost:9200",
   "elastichost": "localhost",
   "elasticport": "9200",
-  "userdir": "/home/ubuntu",
-  "storedir": "/home/ubuntu/store",
-  "dictsdir": "/home/ubuntu/dictionaries",
-  "scraperdir": "/home/ubuntu/journal-scrapers/scrapers/",
+  "userdir": "/home/tom/src/contentmine/canaryvm",
+  "storedir": "/home/tom/src/contentmine/canaryvm/store",
+  "dictsdir": "/home/tom/src/contentmine/canaryvm/dictionaries",
+  "scraperdir": "/home/tom/src/contentmine/canaryvm/scrapers/",
   "downloadPapers": false
 }

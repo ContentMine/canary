@@ -4,6 +4,8 @@ import * as _ from 'lodash'
 path=require('path')
 import * as fs from 'fs'
 import {XMLHttpRequest as xmhtrq} from 'xmlhttprequest';
+var AgentKeepAlive = require('agentkeepalive');
+
 
 // =====================================================================================
 // FUNCTIONS TO GET CONTENT INTO THE INDEX
@@ -11,17 +13,43 @@ import {XMLHttpRequest as xmhtrq} from 'xmlhttprequest';
 // to elastic search
 var ESClient = function () {
 	var client = new elasticsearch.Client({
-		host: Meteor.settings.elastichost+':'+Meteor.settings.elasticport
+		host: Meteor.settings.elastichost+':'+Meteor.settings.elasticport,
+    createNodeAgent(connection, config) {
+	    return new AgentKeepAlive(connection.makeAgentConfig(config));
+    }
 	})
 	return client
 }
 
-var uploadJSONFileToES =  function (file, index, type, client) {
+var uploadJSONFileToES =  function(file, index, type, client) {
 	fs.readFile(file, function (err, data) {
 		client.create({
 			index: index,
 			type: type,
 			body: JSON.parse(data)
+		})
+	})
+}
+
+var uploadXMLFileToES = function(file, index, type, client) {
+	fs.readFile(file, function (err, data) {
+		client.create({
+			index: index,
+			type: type,
+			body: {
+				"fulltext": data.toString('utf8')
+			}
+		})
+	})
+}
+
+var loadEuPMCFullTexts = function(folder) {
+	var client = ESClient()
+	recursive(folder, function(err, files) {
+		files.forEach(function (file) {
+			if(path.basename(file)=="fulltext.xml") {
+			uploadXMLFileToES(file, 'fulltext', 'unstructured', client)
+			}
 		})
 	})
 }
@@ -41,15 +69,15 @@ var indexEuPMCMetadata = function(folder) {
 var indexMetadata = function(dailyset) {
 	indexEuPMCMetadata(Meteor.settings.storedir + '/' + dailyset)
   // for every metadata record, use the folder name (the URL uid) as the _id for the record
-  bulkload(metadata,'/catalogue/'+dailyset,true);
+  //bulkload(metadata,'/catalogue/'+dailyset,true);
   var mdwithflattext = [];
   //var mdwithstructuredtext = [];
   // for every metadata record look in its folder and see if there is a fulltext.txt
-  for ( var m in metadata) {
+  //for ( var m in metadata) {
     // look for the fulltext.txt file and read in the content of it to metadata[m].text
     // if the fulltext was found, then mdwithflattext.push(metadata[m])
-  }
-  if (mdwithflattext.length > 0) bulkload(mdwithflattext,'/flat/'+dailyset,true);
+  //}
+  // if (mdwithflattext.length > 0) bulkload(mdwithflattext,'/flat/'+dailyset,true);
   // if norma processing is enabled, and structured fulltext can also be found in a scholarly.html file,
   // then the loop above could also popualte the mdwithstructuredtext array, and that too could be bulkloaded to '/structured/'+dailyset
 }
@@ -116,3 +144,5 @@ var bulkload = function(records,route,create) {
 
 module.exports.indexMetadata = indexMetadata
 module.exports.bulkload = bulkload
+module.exports.loadEuPMCFullTexts = loadEuPMCFullTexts
+module.exports.ESClient = ESClient

@@ -35,6 +35,7 @@ API.addRoute('retrieve', {
 });
 API.addRoute('extract', {
 	get: function() {
+		cron.extract(this.urlParams.dailyset)
 		return {}; // TODO extract the content of a given source - accept a dicts param to list which dicts to run, and a query param to identify the catalogue items to run it against
 	}
 });

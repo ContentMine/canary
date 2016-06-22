@@ -1,6 +1,8 @@
 import * as fs from 'fs'
 retrieve = require('./retrieve.js')
 index = require('./index.js')
+recursive=require('recursive-readdir')
+
 
 // ========================================================================================
 // THE DAILY FUNCTIONS TO RETRIEVE AND PROCESS ARTICLES EACH DAY
@@ -10,7 +12,7 @@ var etl = function(dailyset) {
     fs.mkdirSync(Meteor.settings.storedir + '/' + dts);
   }
   // TODO update to indexed (NOT published date) date query for crossref and eupmc (this is possible, but need to know how getpapers expects that)
-	var qry = 'FIRST_PDATE:' + dts + ' AND (JOURNAL:plos* OR JOURNAL:bmc*)';
+	var qry = 'FIRST_PDATE:' + dts;
 	var urls = retrieve.getpapers(qry, dts); // TODO we somehow need the metadata returned by getpapers for each URL too
   /*
 	for ( var i in urls ) {
@@ -23,8 +25,115 @@ var etl = function(dailyset) {
 	}
   */
   index.indexMetadata(dailyset);
+  index.loadEuPMCFullTexts(Meteor.settings.storedir + '/' + dailyset)
   //extract(dailyset);
 };
+
+//updated extraction functino being written by tom
+var extractNew = function(dailyset) {
+  readDictionaries(dailyset)
+}
+
+var readDictionaries = function(dailyset) {
+  var dictionaries = []
+  var folder = '/home/tom/src/contentmine/canaryvm/dictionaries/json'
+  var client = index.ESClient()
+  recursive(folder, function(err, files) {
+    files.forEach(function (file) {
+      fs.readFile(file, 'utf8', function (err, data) {
+          dictionaryQuery(JSON.parse(data), dailyset, client)
+      })
+    })
+  })
+}
+
+// Pass it the full dictionary first time. On the last successful upload of data
+// run again with the first entry removed and repeate until empty
+var dictionaryQuery = function (dictionary, dailyset, client) {
+  var id = dictionary.id
+  setTimeout(function() {
+    if (dictionary.entries.length) {
+    entry = dictionary.entries.shift()
+    console.log(entry)
+    dictionarySingleQuery(dailyset, entry, id, dictionary, client)
+    }
+  }, 0)
+}
+
+var dictionarySingleQuery = function(dailyset, entry, id, dictionary, client) {
+  //console.log(id)
+  client.search({
+    index: "fulltext",
+    type: "unstructured",
+    body: {
+      _source: false,
+      query: {
+        match: {
+          fulltext: entry.term
+        }
+      },
+      highlight: {
+        encoder: "html",
+        fields: {
+          fulltext: {}
+        }
+      }
+    }
+  }, function (error, response) {
+    if (error) {
+      console.log(error)
+    }
+    if (!error) {
+      //console.log(response)
+      finalDoc = false
+
+      if(response.hits.hits.length == 0) dictionaryQuery(dictionary, 'foo', client)
+      for(var j=0; j<response.hits.hits.length; j++){
+        if (j==response.hits.hits.length-1) finalDoc = true
+        uploadOneDocFacts(response.hits.hits[j]._id, response.hits.hits[j].highlight.fulltext, id, dictionary, finalDoc, client)
+      }
+    }
+  })
+}
+
+//insert all the fact from one document as returned by ES
+var uploadOneDocFacts = function(docId, snippetArray, dictid, dictionary, finalDoc, client) {
+  //console.log('snippet array is: ' + snippetArray)
+  finalFact = false
+  for(var i=0; i<snippetArray.length; i++) {
+    if (finalDoc && i==snippetArray.length-1) {finalFact=true}
+    var match = snippetArray[i]
+    var fact = {}
+    if (match.indexOf('<em>') !== -1) {
+      fact.prefix = match.split('<em>')[0];
+      fact.term = match.split('<em>')[1].split('</em>')[0];
+      fact.postfix = match.split('</em>')[1];
+    } else {
+      fact.prefix = '';
+      fact.term = match;
+      fact.postfix = '';
+    }
+    uploadOneFact(fact, docId, dictid, dictionary, finalFact, client)
+  }
+}
+
+var uploadOneFact = function(fact, docId, dictid, dictionary, finalFact, client) {
+  //console.log("uploading one fact")
+  var client = index.ESClient()
+  client.create({
+    index: 'facts',
+    type: 'snippet',
+    body: {
+      "prefix": fact.prefix,
+      "post": fact.postfix,
+      "term": fact.term,
+      "documentID": docId,
+      "dictionaryID": dictid
+    }
+  }, function() {
+    if (finalFact) dictionaryQuery(dictionary, 'foo', client)
+  })
+}
 
 var extract = function(dailyset,dicts) {
 	// TODO start with execing a git pull inside the dictionaries folder (can use process.chdir(<DIRNAME>) to get into the dir)
@@ -94,3 +203,4 @@ SyncedCron.add({
 if (Meteor.settings.runcron) SyncedCron.start();
 
 module.exports.etl = etl
+module.exports.extract = extractNew
