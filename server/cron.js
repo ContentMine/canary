@@ -26,8 +26,16 @@ var etl = function(dailyset) {
   */
   index.indexMetadata(dailyset);
   index.loadEuPMCFullTexts(Meteor.settings.storedir + '/' + dailyset)
-  //extract(dailyset);
+  extractNew(dailyset)
+  emptyFulltext()
 };
+
+var emptyFulltext = function(dailyset) {
+  client = index.ESClient()
+  client.delete({
+    index: 'fulltext'
+  })
+}
 
 //updated extraction functino being written by tom
 var extractNew = function(dailyset) {
