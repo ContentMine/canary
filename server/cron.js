@@ -131,7 +131,7 @@ var uploadOneFact = function(fact, docId, dictid, dictionary, finalFact, client,
       "post": fact.postfix,
       "term": fact.term,
       "documentID": docId,
-      "dictionaryID": dictid
+      "dictionaryID": dictid,
       "cprojectID": cprojectID
     }
   }, function() {

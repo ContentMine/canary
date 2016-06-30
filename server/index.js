@@ -23,9 +23,9 @@ var ESClient = function () {
 
 var uploadJSONFileToES =  function(file, index, type, client, cprojectID) {
 	fs.readFile(file, function (err, data) {
+		document = JSON.parse(data)
+		document.cprojectID = cprojectID
 		client.create({
-			document = JSON.parse(data)
-			document.cprojectID = cprojectID
 			index: index,
 			type: type,
 			body: document
