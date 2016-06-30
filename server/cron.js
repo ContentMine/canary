@@ -25,9 +25,9 @@ var etl = function(dailyset) {
 	}
   */
   index.indexMetadata(dailyset);
+  emptyFulltext()
   index.loadEuPMCFullTexts(Meteor.settings.storedir + '/' + dailyset)
   extractNew(dailyset)
-  emptyFulltext()
 };
 
 var emptyFulltext = function(dailyset) {
