@@ -113,9 +113,9 @@ var uploadOneDocFacts = function(docId, snippetArray, dictid, dictionary, finalD
       fact.term = match;
       fact.postfix = '';
     }
-    fact.prefix = decodeURIComponent(fact.prefix)
-    fact.term = decodeURIComponent(fact.term)
-    fact.postfix = decodeURIComponent(fact.postfix)
+    fact.prefix = unescape(fact.prefix)
+    fact.term = unescape(fact.term)
+    fact.postfix = unescape(fact.postfix)
     uploadOneFact(fact, docId, dictid, dictionary, finalFact, client)
   }
 }
