@@ -36,7 +36,7 @@ var extractNew = function(dailyset) {
 
 var readDictionaries = function(dailyset) {
   var dictionaries = []
-  var folder = '/home/tom/src/contentmine/canaryvm/dictionaries/json'
+  var folder = Meteor.settings.dictsdir + '/json/'
   var client = index.ESClient()
   recursive(folder, function(err, files) {
     files.forEach(function (file) {
