@@ -21,23 +21,26 @@ var ESClient = function () {
 	return client
 }
 
-var uploadJSONFileToES =  function(file, index, type, client) {
+var uploadJSONFileToES =  function(file, index, type, client, cprojectID) {
 	fs.readFile(file, function (err, data) {
 		client.create({
+			document = JSON.parse(data)
+			document.cprojectID = cprojectID
 			index: index,
 			type: type,
-			body: JSON.parse(data)
+			body: document
 		})
 	})
 }
 
-var uploadXMLFileToES = function(file, index, type, client) {
+var uploadXMLFileToES = function(file, index, type, client, cprojectID) {
 	fs.readFile(file, function (err, data) {
 		client.create({
 			index: index,
 			type: type,
 			body: {
-				"fulltext": data.toString('utf8')
+				"fulltext": data.toString('utf8'),
+				"cprojectID": cprojectID
 			}
 		})
 	})
@@ -48,7 +51,8 @@ var loadEuPMCFullTexts = function(folder) {
 	recursive(folder, function(err, files) {
 		files.forEach(function (file) {
 			if(path.basename(file)=="fulltext.xml") {
-			uploadXMLFileToES(file, 'fulltext', 'unstructured', client)
+				cprojectID = path.basename(path.parse(file).dir)
+				uploadXMLFileToES(file, 'fulltext', 'unstructured', client, cprojectID)
 			}
 		})
 	})
@@ -60,7 +64,8 @@ var indexEuPMCMetadata = function(folder) {
 	recursive(folder, function(err, files) {
 		files.forEach(function (file) {
 	    if(path.basename(file)=="eupmc_result.json") {
-	    uploadJSONFileToES(file, 'metadata', 'eupmc', client)
+				cprojectID = path.basename(path.parse(file).dir)
+	    	uploadJSONFileToES(file, 'metadata', 'eupmc', client, cprojectID)
 	    }
 	  })
 	})
