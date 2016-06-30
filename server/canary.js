@@ -62,3 +62,9 @@ API.addRoute('store', {
 		// this could probably also just be served by nginx configuration
 	}
 });
+API.addRoute('dump', {
+	get: function () {
+		index.dump()
+		return {}
+	}
+})

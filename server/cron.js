@@ -68,7 +68,7 @@ var dictionarySingleQuery = function(dailyset, entry, id, dictionary, client) {
     body: {
       _source: false,
       query: {
-        match: {
+        match_phrase: {
           fulltext: entry.term
         }
       },
@@ -113,6 +113,9 @@ var uploadOneDocFacts = function(docId, snippetArray, dictid, dictionary, finalD
       fact.term = match;
       fact.postfix = '';
     }
+    fact.prefix = decodeURIComponent(fact.prefix)
+    fact.term = decodeURIComponent(fact.term)
+    fact.postfix = decodeURIComponent(fact.postfix)
     uploadOneFact(fact, docId, dictid, dictionary, finalFact, client)
   }
 }
