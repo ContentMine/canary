@@ -51,7 +51,7 @@ var loadEuPMCFullTexts = function(folder) {
 	recursive(folder, function(err, files) {
 		files.forEach(function (file) {
 			if(path.basename(file)=="fulltext.xml") {
-				cprojectID = path.basename(path.parse(file).dir)
+				cprojectID = path.basename(path.dirname(file))
 				uploadXMLFileToES(file, 'fulltext', 'unstructured', client, cprojectID)
 			}
 		})
@@ -64,7 +64,7 @@ var indexEuPMCMetadata = function(folder) {
 	recursive(folder, function(err, files) {
 		files.forEach(function (file) {
 	    if(path.basename(file)=="eupmc_result.json") {
-				cprojectID = path.basename(path.parse(file).dir)
+				cprojectID = path.basename(path.dirname(file))
 	    	uploadJSONFileToES(file, 'metadata', 'eupmc', client, cprojectID)
 	    }
 	  })
