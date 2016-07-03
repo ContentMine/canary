@@ -1,7 +1,7 @@
-recursive=require('recursive-readdir')
+var recursive=require('recursive-readdir')
 var elasticsearch = require('elasticsearch');
 import * as _ from 'lodash'
-path=require('path')
+var path=require('path')
 import * as fs from 'fs'
 import {XMLHttpRequest as xmhtrq} from 'xmlhttprequest';
 var AgentKeepAlive = require('agentkeepalive');

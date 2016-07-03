@@ -4,7 +4,7 @@ import * as thresher from 'thresher';
 import * as moment from 'moment';
 import * as child_process from 'child_process';
 import fs from 'fs'
-mark = require('./markscommon.js')
+var mark = require('./markscommon.js')
 
 // =====================================================================================
 // FUNCTIONS TO CHECK AND RETRIEVE URLS AND READ FROM GETPAPERS / QUICKSCRAPE / THRESHER OUTPUT

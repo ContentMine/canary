@@ -1,7 +1,7 @@
 import * as fs from 'fs'
-retrieve = require('./retrieve.js')
-index = require('./index.js')
-recursive=require('recursive-readdir')
+var retrieve = require('./retrieve.js')
+var index = require('./index.js')
+var recursive=require('recursive-readdir')
 
 
 // ========================================================================================
