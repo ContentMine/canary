@@ -75,9 +75,10 @@ var dictionarySingleQuery = function(dailyset, entry, id, dictionary, client) {
     type: "unstructured",
     body: {
       _source: false,
+      fields: ['cprojectID'],
       query: {
         match_phrase: {
-          fulltext: entry.term
+          fulltext: "water"
         }
       },
       highlight: {
@@ -98,7 +99,7 @@ var dictionarySingleQuery = function(dailyset, entry, id, dictionary, client) {
       if(response.hits.hits.length == 0) dictionaryQuery(dictionary, 'foo', client)
       for(var j=0; j<response.hits.hits.length; j++){
         if (j==response.hits.hits.length-1) finalDoc = true
-        uploadOneDocFacts(response.hits.hits[j]._id, response.hits.hits[j].highlight.fulltext, id, dictionary, finalDoc, client, response.hits.hits[j].cprojectID)
+        uploadOneDocFacts(response.hits.hits[j]._id, response.hits.hits[j].highlight.fulltext, id, dictionary, finalDoc, client, response.hits.hits[j].fields.cprojectID)
       }
     }
   })
