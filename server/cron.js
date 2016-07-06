@@ -81,7 +81,7 @@ var dictionarySingleQuery = function(dailyset, entry, id, dictionary, client) {
       fields: ['cprojectID'],
       query: {
         match_phrase: {
-          fulltext: "water"
+          fulltext: entry.term
         }
       },
       highlight: {
