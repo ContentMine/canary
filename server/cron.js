@@ -2,6 +2,9 @@ import * as fs from 'fs'
 var retrieve = require('./retrieve.js')
 var index = require('./index.js')
 var recursive=require('recursive-readdir')
+var Entities = require('html-entities').XmlEntities;
+
+entities = new Entities();
 
 
 // ========================================================================================
@@ -122,9 +125,9 @@ var uploadOneDocFacts = function(docId, snippetArray, dictid, dictionary, finalD
       fact.term = match;
       fact.postfix = '';
     }
-    fact.prefix = unescape(fact.prefix)
-    fact.term = unescape(fact.term)
-    fact.postfix = unescape(fact.postfix)
+    fact.prefix = entities.decode(fact.prefix)
+    fact.term = entities.decode(fact.term)
+    fact.postfix = entities.decode(fact.postfix)
     uploadOneFact(fact, docId, dictid, dictionary, finalFact, client, cprojectID)
   }
 }
