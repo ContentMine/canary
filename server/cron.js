@@ -102,14 +102,14 @@ var dictionarySingleQuery = function(dailyset, entry, id, dictionary, client) {
       if(response.hits.hits.length == 0) dictionaryQuery(dictionary, 'foo', client)
       for(var j=0; j<response.hits.hits.length; j++){
         if (j==response.hits.hits.length-1) finalDoc = true
-        uploadOneDocFacts(response.hits.hits[j]._id, response.hits.hits[j].highlight.fulltext, id, dictionary, finalDoc, client, response.hits.hits[j].fields.cprojectID)
+        uploadOneDocFacts(response.hits.hits[j]._id, response.hits.hits[j].highlight.fulltext, id, dictionary, finalDoc, client, response.hits.hits[j].fields.cprojectID, entry.identifiers)
       }
     }
   })
 }
 
-//insert all the fact from one document as returned by ES
-var uploadOneDocFacts = function(docId, snippetArray, dictid, dictionary, finalDoc, client, cprojectID) {
+//insert all the facts from one document as returned by ES
+var uploadOneDocFacts = function(docId, snippetArray, dictid, dictionary, finalDoc, client, cprojectID, identifiers) {
   //console.log('snippet array is: ' + snippetArray)
   finalFact = false
   for(var i=0; i<snippetArray.length; i++) {
@@ -129,11 +129,11 @@ var uploadOneDocFacts = function(docId, snippetArray, dictid, dictionary, finalD
     fact.term = entities.decode(fact.term)
     fact.postfix = entities.decode(fact.postfix)
     console.log(match)
-    uploadOneFact(fact, docId, dictid, dictionary, finalFact, client, cprojectID)
+    uploadOneFact(fact, docId, dictid, dictionary, finalFact, client, cprojectID, identifiers)
   }
 }
 
-var uploadOneFact = function(fact, docId, dictid, dictionary, finalFact, client, cprojectID) {
+var uploadOneFact = function(fact, docId, dictid, dictionary, finalFact, client, cprojectID, identifiers) {
   //console.log("uploading one fact")
   var client = index.ESClient()
   client.create({
@@ -145,7 +145,8 @@ var uploadOneFact = function(fact, docId, dictid, dictionary, finalFact, client,
       "term": fact.term,
       "documentID": docId,
       "dictionaryID": dictid,
-      "cprojectID": cprojectID
+      "cprojectID": cprojectID,
+      "identifiers": identifiers
     }
   }, function() {
     if (finalFact) dictionaryQuery(dictionary, 'foo', client)
