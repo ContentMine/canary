@@ -65,7 +65,7 @@ var dictionaryQuery = function (dictionary, dailyset, client) {
   setTimeout(function() {
     if (dictionary.entries.length) {
     entry = dictionary.entries.shift()
-    console.log(entry)
+    //console.log(entry)
     dictionarySingleQuery(dailyset, entry, id, dictionary, client)
     }
   }, 0)
