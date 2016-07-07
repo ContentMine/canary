@@ -128,6 +128,7 @@ var uploadOneDocFacts = function(docId, snippetArray, dictid, dictionary, finalD
     fact.prefix = entities.decode(fact.prefix)
     fact.term = entities.decode(fact.term)
     fact.postfix = entities.decode(fact.postfix)
+    console.log(match)
     uploadOneFact(fact, docId, dictid, dictionary, finalFact, client, cprojectID)
   }
 }
