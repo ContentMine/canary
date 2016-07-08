@@ -46,7 +46,7 @@ var extractNew = function(dailyset) {
   extract.readDictionaries(dailyset)
 }
 
-
+/*
 var extract = function(dailyset,dicts) {
 	// TODO start with execing a git pull inside the dictionaries folder (can use process.chdir(<DIRNAME>) to get into the dir)
 	if (dicts === undefined) dicts = []; // TODO build a list of dict filenames using the node.js fs function to list files in dicts dir - careful to strip out .git or other unwanted cruft
@@ -106,6 +106,7 @@ var extract = function(dailyset,dicts) {
 	bulkload(facts,'/facts/'+dailyset,true);
 	// once this process is complete the flat and structured fulltext indexes for the day could be dumped (but keep the catalogue metadata-only index)
 }
+*/
 
 SyncedCron.add({
 	name: 'ETL',
