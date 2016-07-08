@@ -3,6 +3,7 @@ var retrieve = require('./retrieve.js')
 var index = require('./index.js')
 var recursive=require('recursive-readdir')
 var Entities = require('html-entities').XmlEntities;
+var extract = require('./extract')
 
 entities = new Entities();
 
@@ -42,7 +43,7 @@ var emptyFulltext = function(dailyset) {
 
 //updated extraction functino being written by tom
 var extractNew = function(dailyset) {
-  readDictionaries(dailyset)
+  extract.readDictionaries(dailyset)
 }
 
 
