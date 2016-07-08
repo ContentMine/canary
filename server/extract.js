@@ -61,7 +61,7 @@ var dictionarySingleQuery = function(dailyset, entry, dictionary) {
       if(response.hits.hits.length == 0) dictionaryQuery(dictionary, 'foo', client)
       for(var j=0; j<response.hits.hits.length; j++){
         if (j==response.hits.hits.length-1) finalDoc = true
-        uploadOneDocFacts(response.hits.hits[j], id, dictionary, finalDoc, entry)
+        uploadOneDocFacts(response.hits.hits[j], dictionary, finalDoc, entry)
       }
     }
   })
