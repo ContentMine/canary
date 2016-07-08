@@ -25,12 +25,12 @@ var dictionaryQuery = function (dictionary, dailyset, client) {
     if (dictionary.entries.length) {
     entry = dictionary.entries.shift()
     //console.log(entry)
-    dictionarySingleQuery(dailyset, entry, id, dictionary, client)
+    dictionarySingleQuery(dailyset, entry, dictionary)
     }
   }, 0)
 }
 
-var dictionarySingleQuery = function(dailyset, entry, id, dictionary, client) {
+var dictionarySingleQuery = function(dailyset, entry, dictionary) {
   //console.log(id)
   client.search({
     index: "fulltext",
@@ -61,16 +61,17 @@ var dictionarySingleQuery = function(dailyset, entry, id, dictionary, client) {
       if(response.hits.hits.length == 0) dictionaryQuery(dictionary, 'foo', client)
       for(var j=0; j<response.hits.hits.length; j++){
         if (j==response.hits.hits.length-1) finalDoc = true
-        uploadOneDocFacts(response.hits.hits[j]._id, response.hits.hits[j].highlight.fulltext, id, dictionary, finalDoc, client, response.hits.hits[j].fields.cprojectID, entry.identifiers)
+        uploadOneDocFacts(response.hits.hits[j], id, dictionary, finalDoc, entry)
       }
     }
   })
 }
 
 //insert all the facts from one document as returned by ES
-var uploadOneDocFacts = function(docId, snippetArray, dictid, dictionary, finalDoc, client, cprojectID, identifiers) {
+var uploadOneDocFacts = function(oneDocFacts, dictionary, finalDoc, entry) {
   //console.log('snippet array is: ' + snippetArray)
   finalFact = false
+  var snippetArray = oneDocFacts.highlight.fulltext
   for(var i=0; i<snippetArray.length; i++) {
     if (finalDoc && i==snippetArray.length-1) {finalFact=true}
     var match = snippetArray[i]
@@ -87,12 +88,13 @@ var uploadOneDocFacts = function(docId, snippetArray, dictid, dictionary, finalD
     fact.prefix = entities.decode(fact.prefix)
     fact.term = entities.decode(fact.term)
     fact.postfix = entities.decode(fact.postfix)
-    console.log(match)
-    uploadOneFact(fact, docId, dictid, dictionary, finalFact, client, cprojectID, identifiers)
+    fact.docId = oneDocFacts._id
+    fact.cprojectID = oneDocFacts.fields.cprojectID
+    uploadOneFact(fact, dictionary, finalFact, entry)
   }
 }
 
-var uploadOneFact = function(fact, docId, dictid, dictionary, finalFact, client, cprojectID, identifiers) {
+var uploadOneFact = function(fact, dictionary, finalFact, entry) {
   //console.log("uploading one fact")
   var client = index.ESClient()
   client.create({
@@ -102,13 +104,12 @@ var uploadOneFact = function(fact, docId, dictid, dictionary, finalFact, client,
       "prefix": fact.prefix,
       "post": fact.postfix,
       "term": fact.term,
-      "documentID": docId,
-      "dictionaryID": dictid,
-      "cprojectID": cprojectID,
-      "identifiers": identifiers
+      "documentID": fact.docId,
+      "cprojectID": fact.cprojectID,
+      "identifiers": entry.identifiers
     }
   }, function() {
-    if (finalFact) dictionaryQuery(dictionary, 'foo', client)
+    if (finalFact) dictionaryQuery(dictionary, 'foo')
   })
 }
 
