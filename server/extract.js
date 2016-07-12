@@ -8,6 +8,7 @@ var readDictionaries = function(dailyset) {
   var dictionaries = []
   var folder = Meteor.settings.dictsdir + '/json/'
   var client = index.ESClient()
+  console.log("starting extraction")
   recursive(folder, function(err, files) {
     files.forEach(function (file) {
       fs.readFile(file, 'utf8', function (err, data) {
@@ -26,6 +27,9 @@ var dictionaryQuery = function (dictionary, dailyset, client) {
     entry = dictionary.entries.shift()
     //console.log(entry)
     dictionarySingleQuery(dailyset, entry, dictionary)
+    }
+    else {
+      console.log("finished extraction")
     }
   }, 0)
 }
