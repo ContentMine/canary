@@ -3,7 +3,7 @@ var retrieve = require('./retrieve.js')
 var index = require('./index.js')
 var recursive=require('recursive-readdir')
 var Entities = require('html-entities').XmlEntities;
-var extract = require('./extract')
+var extract = require('./extract.js')
 
 entities = new Entities();
 

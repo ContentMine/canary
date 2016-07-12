@@ -66,7 +66,7 @@ var indexEuPMCMetadata = function(folder) {
 		files.forEach(function (file) {
 	    if(path.basename(file)=="eupmc_result.json") {
 				cprojectID = path.basename(path.dirname(file))
-				console.log("Uploading file with cprojectID: " + cprojectID)
+				//console.log("Uploading file with cprojectID: " + cprojectID)
 	    	uploadJSONFileToES(file, 'metadata', 'eupmc', client, cprojectID)
 	    }
 	  })
