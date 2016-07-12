@@ -49,7 +49,9 @@ var uploadXMLFileToES = function(file, index, type, client, cprojectID, cb) {
 var loadEuPMCFullTexts = function(folder, cb) {
 	var client = ESClient()
 	recursive(folder, function(err, files) {
-		var done = _.after(files.length-1, cb)
+		var done = _.after(files.length-1, function() { cb()
+			console.log("done all loading of files")
+		})
 		files.forEach(function (file) {
 			if(path.basename(file)=="fulltext.xml") {
 				var cprojectID = path.basename(path.dirname(file))
