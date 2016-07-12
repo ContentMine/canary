@@ -33,7 +33,7 @@ var uploadJSONFileToES =  function(file, index, type, client, cprojectID) {
 	})
 }
 
-var uploadXMLFileToES = function(file, index, type, client, cprojectID) {
+var uploadXMLFileToES = function(file, index, type, client, cprojectID, cb) {
 	fs.readFile(file, function (err, data) {
 		client.create({
 			index: index,
@@ -42,17 +42,18 @@ var uploadXMLFileToES = function(file, index, type, client, cprojectID) {
 				"fulltext": data.toString('utf8'),
 				"cprojectID": cprojectID
 			}
-		})
+		}, cb)
 	})
 }
 
-var loadEuPMCFullTexts = function(folder) {
+var loadEuPMCFullTexts = function(folder, cb) {
 	var client = ESClient()
 	recursive(folder, function(err, files) {
+		var done = _.after(files.length, cb)
 		files.forEach(function (file) {
 			if(path.basename(file)=="fulltext.xml") {
 				cprojectID = path.basename(path.dirname(file))
-				uploadXMLFileToES(file, 'fulltext', 'unstructured', client, cprojectID)
+				uploadXMLFileToES(file, 'fulltext', 'unstructured', client, cprojectID, done)
 			}
 		})
 	})
