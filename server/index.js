@@ -56,7 +56,7 @@ var loadEuPMCFullTexts = function(folder, cb) {
 		files.forEach(function (file) {
 			if(path.basename(file)=="fulltext.xml") {
 				var cprojectID = path.basename(path.dirname(file))
-				console.log("uploading fulltext from CProject: " + cprojectID)
+				//console.log("uploading fulltext from CProject: " + cprojectID)
 				uploadXMLFileToES(file, 'fulltext', 'unstructured', client, cprojectID, done)
 			}
 			else {
