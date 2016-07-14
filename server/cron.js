@@ -28,7 +28,7 @@ var etl = function(dailyset) {
     }
 	}
   */
-  emptyFulltext()
+  emptyFulltext() // before metadata load to ensure fulltext index is made before docs inserted
   index.indexMetadata(dailyset);
   index.loadEuPMCFullTexts(Meteor.settings.storedir + '/' + dailyset, function() {extractNew(dailyset)})
 };
@@ -48,7 +48,7 @@ var emptyFulltext = function(dailyset) {
           "fulltext":{"type":"string","term_vector": "with_positions_offsets_payloads",
           "analyzer" : "fulltext_analyzer"}}}}
     }
-  })
+  }, function (err) { console.log(err)})
 }
 
 //updated extraction functino being written by tom
