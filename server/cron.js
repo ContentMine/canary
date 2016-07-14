@@ -33,11 +33,7 @@ var etl = function(dailyset) {
   index.loadEuPMCFullTexts(Meteor.settings.storedir + '/' + dailyset, function() {extractNew(dailyset)})
 };
 
-var emptyFulltext = function(dailyset) {
-  client = index.ESClient()
-  client.delete({
-    index: 'fulltext'
-  })
+var createUnstructuredIndex = function () {
   client.indices.create({
     index: 'fulltext',
     type: 'unstructured',
@@ -49,6 +45,13 @@ var emptyFulltext = function(dailyset) {
           "analyzer" : "fulltext_analyzer"}}}}
     }
   }, function (err) { console.log(err)})
+}
+
+var emptyFulltext = function(dailyset) {
+  client = index.ESClient()
+  client.delete({
+    index: 'fulltext'
+  }, createUnstructuredIndex)
 }
 
 //updated extraction functino being written by tom
