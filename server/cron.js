@@ -40,12 +40,13 @@ var emptyFulltext = function(dailyset) {
   })
   client.indices.create({
     index: 'fulltext',
-    body: "mappings":{
+    body: {"mappings":{
       "unstructured":{
         "properties":{
           "cprojectID":{"type":"string"},
           "fulltext":{"type":"string","term_vector": "with_positions_offsets_payloads",
           "analyzer" : "fulltext_analyzer"}}}}
+    }
   })
 }
 
