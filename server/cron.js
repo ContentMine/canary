@@ -40,7 +40,7 @@ var emptyFulltext = function(dailyset) {
   })
   client.indices.create({
     index: 'fulltext',
-    type: 'unstructured'
+    type: 'unstructured',
     body: {"mappings":{
       "unstructured":{
         "properties":{
