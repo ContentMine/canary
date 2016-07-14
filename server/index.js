@@ -50,7 +50,7 @@ var loadEuPMCFullTexts = function(folder, cb) {
 	var client = ESClient()
 	console.log("reading fulltexts from disk")
 	recursive(folder, function(err, files) {
-		var done = _.after(0, function() { cb()
+		var done = _.after(files.length, function() { cb()
 			console.log("done all loading of files")
 		})
 		files.forEach(function (file) {
@@ -58,6 +58,9 @@ var loadEuPMCFullTexts = function(folder, cb) {
 				var cprojectID = path.basename(path.dirname(file))
 				console.log("uploading fulltext from CProject: " + cprojectID)
 				uploadXMLFileToES(file, 'fulltext', 'unstructured', client, cprojectID, done)
+			}
+			else {
+				done()
 			}
 		})
 	})
