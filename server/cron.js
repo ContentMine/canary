@@ -38,6 +38,15 @@ var emptyFulltext = function(dailyset) {
   client.delete({
     index: 'fulltext'
   })
+  client.indices.create({
+    index: 'fulltext',
+    body: "mappings":{
+      "unstructured":{
+        "properties":{
+          "cprojectID":{"type":"string"},
+          "fulltext":{"type":"string","term_vector": "with_positions_offsets_payloads",
+          "analyzer" : "fulltext_analyzer"}}}}
+  })
 }
 
 //updated extraction functino being written by tom
