@@ -52,7 +52,9 @@ var emptyFulltext = function(callback) {
   client = index.ESClient()
   client.delete({
     index: 'fulltext'
-  }, function () {createUnstructuredIndex(callback) })
+  }, function (err) {
+    console.log(err)
+    createUnstructuredIndex(callback) })
 }
 
 //updated extraction functino being written by tom
