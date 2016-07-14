@@ -28,12 +28,11 @@ var etl = function(dailyset) {
     }
 	}
   */
-  emptyFulltext() // before metadata load to ensure fulltext index is made before docs inserted
-  index.indexMetadata(dailyset);
+  emptyFulltext(function () {index.indexMetadata(dailyset)}) // before metadata load to ensure fulltext index is made before docs inserted
   index.loadEuPMCFullTexts(Meteor.settings.storedir + '/' + dailyset, function() {extractNew(dailyset)})
 };
 
-var createUnstructuredIndex = function () {
+var createUnstructuredIndex = function (callback) {
   client.indices.create({
     index: 'fulltext',
     type: 'unstructured',
@@ -44,14 +43,16 @@ var createUnstructuredIndex = function () {
           "fulltext":{"type":"string","term_vector": "with_positions_offsets_payloads",
           "analyzer" : "fulltext_analyzer"}}}}
     }
-  }, function (err) { console.log(err)})
+  }, function (err) { console.log(err)
+    callback()
+  })
 }
 
-var emptyFulltext = function(dailyset) {
+var emptyFulltext = function(callback) {
   client = index.ESClient()
   client.delete({
     index: 'fulltext'
-  }, createUnstructuredIndex)
+  }, function () {createUnstructuredIndex(callback) })
 }
 
 //updated extraction functino being written by tom
