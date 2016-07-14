@@ -42,8 +42,7 @@ var createUnstructuredIndex = function (callback) {
       "unstructured":{
         "properties":{
           "cprojectID":{"type":"string"},
-          "fulltext":{"type":"string","term_vector": "with_positions_offsets_payloads",
-          "analyzer" : "fulltext_analyzer"}}}}
+          "fulltext":{"type":"string","term_vector": "with_positions_offsets_payloads"}}}}
     }
   }, function (err) { console.log(err)
     callback()
