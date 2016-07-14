@@ -53,7 +53,8 @@ var emptyFulltext = function(callback) {
   client.indices.delete({
     index: 'fulltext'
   }, function (err) {
-    console.log(err)
+    if (err) console.log(err)
+    console.log('fulltext index emptied')
     createUnstructuredIndex(callback) })
 }
 
