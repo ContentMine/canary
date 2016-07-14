@@ -28,8 +28,8 @@ var etl = function(dailyset) {
     }
 	}
   */
-  index.indexMetadata(dailyset);
   emptyFulltext()
+  index.indexMetadata(dailyset);
   index.loadEuPMCFullTexts(Meteor.settings.storedir + '/' + dailyset, function() {extractNew(dailyset)})
 };
 
