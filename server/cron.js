@@ -28,8 +28,10 @@ var etl = function(dailyset) {
     }
 	}
   */
-  emptyFulltext(function () {index.indexMetadata(dailyset)}) // before metadata load to ensure fulltext index is made before docs inserted
-  index.loadEuPMCFullTexts(Meteor.settings.storedir + '/' + dailyset, function() {extractNew(dailyset)})
+  index.indexMetadata(dailyset)
+  emptyFulltext(function () {
+    index.loadEuPMCFullTexts(Meteor.settings.storedir + '/' + dailyset, function() {extractNew(dailyset)})
+  }) // chained to ensure index creation happens in the right order
 };
 
 var createUnstructuredIndex = function (callback) {
