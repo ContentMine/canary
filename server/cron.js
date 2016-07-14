@@ -50,7 +50,7 @@ var createUnstructuredIndex = function (callback) {
 
 var emptyFulltext = function(callback) {
   client = index.ESClient()
-  client.delete({
+  client.indices.delete({
     index: 'fulltext'
   }, function (err) {
     console.log(err)
