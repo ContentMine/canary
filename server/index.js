@@ -50,7 +50,7 @@ var loadEuPMCFullTexts = function(folder, cb) {
 	var client = ESClient()
 	console.log("reading fulltexts from disk")
 	recursive(folder, function(err, files) {
-		var done = _.after(files.length-1, function() { cb()
+		var done = _.after(0, function() { cb()
 			console.log("done all loading of files")
 		})
 		files.forEach(function (file) {
