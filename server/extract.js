@@ -67,8 +67,8 @@ var dictionarySingleQuery = function(dailyset, entry, dictionary, client) {
       for(var j=0; j<response.hits.hits.length; j++){
         uploadOneDocFacts(response.hits.hits[j], dictionary, entry, client)
       }
-    }
     dictionaryQuery(dictionary, 'foo', client)
+  }
   }
   })
 }
