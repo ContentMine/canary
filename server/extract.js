@@ -65,14 +65,14 @@ var dictionarySingleQuery = function(dailyset, entry, dictionary) {
       if(response.hits.hits.length == 0) dictionaryQuery(dictionary, 'foo', client)
       for(var j=0; j<response.hits.hits.length; j++){
         if (j==response.hits.hits.length-1) finalDoc = true
-        uploadOneDocFacts(response.hits.hits[j], dictionary, finalDoc, entry)
+        uploadOneDocFacts(response.hits.hits[j], dictionary, finalDoc, entry, client)
       }
     }
   })
 }
 
 //insert all the facts from one document as returned by ES
-var uploadOneDocFacts = function(oneDocFacts, dictionary, finalDoc, entry) {
+var uploadOneDocFacts = function(oneDocFacts, dictionary, finalDoc, entry, client) {
   //console.log('snippet array is: ' + snippetArray)
   finalFact = false
   var snippetArray = oneDocFacts.highlight.fulltext
@@ -98,9 +98,8 @@ var uploadOneDocFacts = function(oneDocFacts, dictionary, finalDoc, entry) {
   }
 }
 
-var uploadOneFact = function(fact, dictionary, finalFact, entry) {
+var uploadOneFact = function(fact, dictionary, finalFact, entry, client) {
   //console.log("uploading one fact")
-  var client = index.ESClient()
   client.create({
     index: 'facts',
     type: 'snippet',
