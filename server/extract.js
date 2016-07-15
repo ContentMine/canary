@@ -94,7 +94,7 @@ var uploadOneDocFacts = function(oneDocFacts, dictionary, finalDoc, entry, clien
     fact.postfix = entities.decode(fact.postfix)
     fact.docId = oneDocFacts._id
     fact.cprojectID = oneDocFacts.fields.cprojectID
-    uploadOneFact(fact, dictionary, finalFact, entry)
+    uploadOneFact(fact, dictionary, finalFact, entry, client)
   }
 }
 
