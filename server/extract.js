@@ -68,6 +68,7 @@ var dictionarySingleQuery = function(dailyset, entry, dictionary) {
         uploadOneDocFacts(response.hits.hits[j], dictionary, finalDoc, entry, client)
       }
     }
+    dictionaryQuery(dictionary, 'foo')
   })
 }
 
@@ -112,7 +113,7 @@ var uploadOneFact = function(fact, dictionary, finalFact, entry, client) {
       "identifiers": entry.identifiers
     }
   }, function() {
-    if (finalFact) dictionaryQuery(dictionary, 'foo')
+    if (finalFact)
   })
 }
 
