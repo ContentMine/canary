@@ -35,6 +35,7 @@ var etl = function(dailyset) {
 };
 
 var createUnstructuredIndex = function (callback) {
+  var client = index.ESClient()
   client.indices.create({
     index: 'fulltext',
     type: 'unstructured',
@@ -50,7 +51,7 @@ var createUnstructuredIndex = function (callback) {
 }
 
 var emptyFulltext = function(callback) {
-  client = index.ESClient()
+  var client = index.ESClient()
   client.indices.delete({
     index: 'fulltext'
   }, function (err) {

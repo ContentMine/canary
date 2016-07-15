@@ -2,7 +2,7 @@ var fs = require('fs')
 var index = require('./index.js')
 var recursive=require('recursive-readdir')
 var Entities = require('html-entities').XmlEntities;
-entities = new Entities();
+var entities = new Entities();
 
 var readDictionaries = function(dailyset) {
   var dictionaries = []
@@ -26,14 +26,14 @@ var dictionaryQuery = function (dictionary, dailyset, client) {
     if (dictionary.entries.length) {
     entry = dictionary.entries.shift()
     //console.log(entry)
-    dictionarySingleQuery(dailyset, entry, dictionary)
+    dictionarySingleQuery(dailyset, entry, dictionary, client)
     } else {
       console.log("finished extraction")
     }
   }, 0)
 }
 
-var dictionarySingleQuery = function(dailyset, entry, dictionary) {
+var dictionarySingleQuery = function(dailyset, entry, dictionary, client) {
   //console.log(id)
   client.search({
     index: "fulltext",
@@ -58,7 +58,7 @@ var dictionarySingleQuery = function(dailyset, entry, dictionary) {
       console.log(error)
     }
     if (!error) {
-      //console.log(response)
+      console.log(response)
       finalDoc = false
 
       if(response.hits.hits.length == 0) dictionaryQuery(dictionary, 'foo', client)
