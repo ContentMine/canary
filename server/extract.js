@@ -112,8 +112,8 @@ var uploadOneFact = function(fact, dictionary, finalFact, entry, client) {
       "cprojectID": fact.cprojectID,
       "identifiers": entry.identifiers
     }
-  }, function() {
-    if (finalFact)
+  }, function(err) {
+    if (err) console.log(err)
   })
 }
 
