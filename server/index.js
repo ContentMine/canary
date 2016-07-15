@@ -13,8 +13,7 @@ var AgentKeepAlive = require('agentkeepalive');
 // to elastic search
 var ESClient = function () {
 	var client = new elasticsearch.Client({
-		host: Meteor.settings.elastichost+':'+Meteor.settings.elasticport,
-		sniffOnStart: true,
+		hosts: Meteor.settings.elastichosts,
 		maxSockets: 20,
     createNodeAgent(connection, config) {
 	    return new AgentKeepAlive(connection.makeAgentConfig(config));
