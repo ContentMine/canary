@@ -15,7 +15,6 @@ var ESClient = function () {
 	var client = new elasticsearch.Client({
 		host: Meteor.settings.elastichost+':'+Meteor.settings.elasticport,
 		sniffOnStart: true,
-		sniffInterval: 60000,
     createNodeAgent(connection, config) {
 	    return new AgentKeepAlive(connection.makeAgentConfig(config));
     }
