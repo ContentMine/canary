@@ -29,6 +29,7 @@ var dictionaryQuery = function (dictionary, dailyset, client) {
     dictionarySingleQuery(dailyset, entry, dictionary, client)
     } else {
       console.log("finished extraction")
+      return
     }
   }, 0)
 }
