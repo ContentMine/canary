@@ -27,8 +27,7 @@ var dictionaryQuery = function (dictionary, dailyset, client) {
     entry = dictionary.entries.shift()
     //console.log(entry)
     dictionarySingleQuery(dailyset, entry, dictionary)
-    }
-    else {
+    } else {
       console.log("finished extraction")
     }
   }, 0)
