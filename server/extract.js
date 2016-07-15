@@ -24,7 +24,7 @@ var dictionaryQuery = function (dictionary, dailyset, client) {
   var id = dictionary.id
   setTimeout(function() {
     if (dictionary.entries.length) {
-    entry = dictionary.entries.shift()
+    var entry = dictionary.entries.shift()
     //console.log(entry)
     dictionarySingleQuery(dailyset, entry, dictionary, client)
     } else {
@@ -60,12 +60,10 @@ var dictionarySingleQuery = function(dailyset, entry, dictionary, client) {
     }
     if (!error) {
       //console.log(response)
-      finalDoc = false
 
       if(response.hits.hits.length == 0) dictionaryQuery(dictionary, 'foo', client)
       for(var j=0; j<response.hits.hits.length; j++){
-        if (j==response.hits.hits.length-1) finalDoc = true
-        uploadOneDocFacts(response.hits.hits[j], dictionary, finalDoc, entry, client)
+        uploadOneDocFacts(response.hits.hits[j], dictionary, entry, client)
       }
     }
     dictionaryQuery(dictionary, 'foo', client)
@@ -73,12 +71,10 @@ var dictionarySingleQuery = function(dailyset, entry, dictionary, client) {
 }
 
 //insert all the facts from one document as returned by ES
-var uploadOneDocFacts = function(oneDocFacts, dictionary, finalDoc, entry, client) {
+var uploadOneDocFacts = function(oneDocFacts, dictionary, entry, client) {
   //console.log('snippet array is: ' + snippetArray)
-  finalFact = false
   var snippetArray = oneDocFacts.highlight.fulltext
   for(var i=0; i<snippetArray.length; i++) {
-    if (finalDoc && i==snippetArray.length-1) {finalFact=true}
     var match = snippetArray[i]
     var fact = {}
     if (match.indexOf('<em>') !== -1) {
@@ -95,11 +91,11 @@ var uploadOneDocFacts = function(oneDocFacts, dictionary, finalDoc, entry, clien
     fact.postfix = entities.decode(fact.postfix)
     fact.docId = oneDocFacts._id
     fact.cprojectID = oneDocFacts.fields.cprojectID
-    uploadOneFact(fact, dictionary, finalFact, entry, client)
+    uploadOneFact(fact, dictionary, entry, client)
   }
 }
 
-var uploadOneFact = function(fact, dictionary, finalFact, entry, client) {
+var uploadOneFact = function(fact, dictionary, entry, client) {
   //console.log("uploading one fact")
   client.create({
     index: 'facts',
