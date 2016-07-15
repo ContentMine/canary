@@ -58,7 +58,7 @@ var dictionarySingleQuery = function(dailyset, entry, dictionary, client) {
       console.log(error)
     }
     if (!error) {
-      console.log(response)
+      //console.log(response)
       finalDoc = false
 
       if(response.hits.hits.length == 0) dictionaryQuery(dictionary, 'foo', client)
@@ -67,7 +67,7 @@ var dictionarySingleQuery = function(dailyset, entry, dictionary, client) {
         uploadOneDocFacts(response.hits.hits[j], dictionary, finalDoc, entry, client)
       }
     }
-    dictionaryQuery(dictionary, 'foo')
+    dictionaryQuery(dictionary, 'foo', client)
   })
 }
 
