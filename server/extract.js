@@ -50,7 +50,7 @@ var dictionarySingleQuery = function(dailyset, entry, dictionary, client) {
       highlight: {
         encoder: "html",
         fields: {
-          fulltext: {}
+          fulltext: { boundary_chars: '.,!?\t\n'}
         }
       }
     }
