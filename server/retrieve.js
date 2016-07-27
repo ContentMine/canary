@@ -49,7 +49,7 @@ var getPapers = function(searchstr, dailyset) {
 	var sd = Meteor.settings.storedir + '/' + dailyset;
 	console.log('running getpapers for query ' + searchstr);
 	var api = 'eupmc'; // should be crossref, and maybe also eupmc if desirable
-	var cmd = "getpapers --query '" + searchstr + "' -x --outdir " + sd; // + ' --all';
+	var cmd = "getpapers --query '" + searchstr + "' -x --outdir '" + sd + "'"; // + ' --all';
 	var child = mark.aexec(cmd);
 	var urls = geturls(sd, api);
 	return urls;
