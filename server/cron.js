@@ -52,7 +52,12 @@ var createUnstructuredIndex = function (callback) {
 
 var emptyFulltext = function(callback) {
   var client = index.ESClient()
-  fs.access(Meteor.settings.storedir + '/elasticsearch.lock', fs.constants.F_OK, (err) => {
+  fs.stat(Meteor.settings.storedir + '/elasticsearch.lock', (err, stats) => {
+    if (err) throw error
+    if (stats.isFile) {
+      throw 'File lock inplace, extraction in progress or delete elasticsearch.lock'
+    }
+    else {
   fs.writeFile(Meteor.settings.storedir + '/elasticsearch.lock', '', (err) => {
     client.indices.delete({
       index: 'fulltext'
@@ -61,6 +66,7 @@ var emptyFulltext = function(callback) {
       console.log('fulltext index emptied')
       createUnstructuredIndex(callback) })
   })
+}
   });
   // Test if lockfile in place; if so reject attempt with error
   // Else place lockfile
