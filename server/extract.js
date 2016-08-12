@@ -3,6 +3,9 @@ var index = require('./index.js')
 var recursive=require('recursive-readdir')
 var Entities = require('html-entities').XmlEntities;
 var entities = new Entities();
+var _ = require('lodash')
+
+var numberOfFiles
 
 var readDictionaries = function(dailyset) {
   var dictionaries = []
@@ -10,6 +13,7 @@ var readDictionaries = function(dailyset) {
   var client = index.ESClient()
   console.log("starting extraction")
   recursive(folder, function(err, files) {
+    numberOfFiles = files.length
     files.forEach(function (file) {
       fs.readFile(file, 'utf8', function (err, data) {
           dictionaryQuery(JSON.parse(data), dailyset, client)
@@ -17,6 +21,12 @@ var readDictionaries = function(dailyset) {
     })
   })
 }
+
+var finished = _.after(numberOfFiles, () => {fs.deleteFile(Meteor.settings.storedir + '/elasticsearch.lock', () => {
+  console.log('all extractions finished')
+})
+
+})
 
 // Pass it the full dictionary first time. On the last successful upload of data
 // run again with the first entry removed and repeate until empty
@@ -29,6 +39,8 @@ var dictionaryQuery = function (dictionary, dailyset, client) {
     dictionarySingleQuery(dailyset, entry, dictionary, client)
     } else {
       console.log("finished extraction")
+      finished()
+      //call finished function
       return
     }
   }, 0)

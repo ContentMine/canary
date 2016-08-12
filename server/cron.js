@@ -52,15 +52,21 @@ var createUnstructuredIndex = function (callback) {
 
 var emptyFulltext = function(callback) {
   var client = index.ESClient()
-  client.indices.delete({
-    index: 'fulltext'
-  }, function (err) {
-    if (err) console.log(err)
-    console.log('fulltext index emptied')
-    createUnstructuredIndex(callback) })
+  fs.access(Meteor.settings.storedir + '/elasticsearch.lock', fs.constants.F_OK, (err) => {
+  fs.writeFile(Meteor.settings.storedir + '/elasticsearch.lock', '', (err) => {
+    client.indices.delete({
+      index: 'fulltext'
+    }, function (err) {
+      if (err) console.log(err)
+      console.log('fulltext index emptied')
+      createUnstructuredIndex(callback) })
+  })
+  });
+  // Test if lockfile in place; if so reject attempt with error
+  // Else place lockfile
 }
 
-//updated extraction functino being written by tom
+//updated extraction function being written by tom
 var extractNew = function(dailyset) {
   extract.readDictionaries(dailyset)
 }
