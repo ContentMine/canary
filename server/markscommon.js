@@ -1,5 +1,3 @@
-var Async = require('async')
-
 var uid = function(url) {
 	return url.replace(/\/+/g, '_').replace(/:/g, '');
 };
