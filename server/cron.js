@@ -53,7 +53,7 @@ var createUnstructuredIndex = function (callback) {
 var emptyFulltext = function(callback) {
   var client = index.ESClient()
   fs.stat(Meteor.settings.storedir + '/elasticsearch.lock', (err, stats) => {
-    if (err) throw err
+    //if (err) throw err
     if (stats.isFile) {
       throw 'File lock inplace, extraction in progress or delete elasticsearch.lock'
     }
