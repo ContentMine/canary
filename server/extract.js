@@ -15,8 +15,10 @@ var readDictionaries = function(dailyset) {
   console.log("starting extraction")
   recursive(folder, function(err, files) {
     numberOfFiles = files.length
-    finished = _.after(numberOfFiles, () => {fs.deleteFile(Meteor.settings.storedir + '/elasticsearch.lock', () => {
-      console.log('all extractions finished')
+    finished = _.after(numberOfFiles, () => {
+      fs.deleteFile(Meteor.settings.storedir + '/elasticsearch.lock', () => {
+        console.log('all extractions finished')
+      })
     })
     files.forEach(function (file) {
       fs.readFile(file, 'utf8', function (err, data) {
@@ -26,7 +28,6 @@ var readDictionaries = function(dailyset) {
   })
 }
 
-}
 
 // Pass it the full dictionary first time. On the last successful upload of data
 // run again with the first entry removed and repeate until empty
