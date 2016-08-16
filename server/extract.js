@@ -16,7 +16,7 @@ var readDictionaries = function(dailyset) {
   recursive(folder, function(err, files) {
     numberOfFiles = files.length
     finished = _.after(numberOfFiles, () => {
-      fs.unline(Meteor.settings.storedir + '/elasticsearch.lock', (err) => {
+      fs.unlink(Meteor.settings.storedir + '/elasticsearch.lock', (err) => {
         if (err) throw err
         console.log('all extractions finished')
       })
