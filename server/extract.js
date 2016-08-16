@@ -26,10 +26,6 @@ var readDictionaries = function(dailyset) {
   })
 }
 
-var finished = _.after(numberOfFiles, () => {fs.deleteFile(Meteor.settings.storedir + '/elasticsearch.lock', () => {
-  console.log('all extractions finished')
-})
-
 })
 
 // Pass it the full dictionary first time. On the last successful upload of data
