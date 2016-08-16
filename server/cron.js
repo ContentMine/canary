@@ -67,7 +67,6 @@ var emptyFulltext = function(callback) {
   })
 }
   else throw err
-}
   });
   // Test if lockfile in place; if so reject attempt with error
   // Else place lockfile
