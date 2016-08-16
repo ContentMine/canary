@@ -26,7 +26,7 @@ var readDictionaries = function(dailyset) {
   })
 }
 
-})
+}
 
 // Pass it the full dictionary first time. On the last successful upload of data
 // run again with the first entry removed and repeate until empty
