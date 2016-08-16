@@ -65,6 +65,7 @@ var emptyFulltext = function(callback) {
       console.log('fulltext index emptied')
       createUnstructuredIndex(callback) })
   })
+}
   else throw err
 }
   });
