@@ -6,6 +6,7 @@ var entities = new Entities();
 var _ = require('lodash')
 
 var numberOfFiles
+var finished
 
 var readDictionaries = function(dailyset) {
   var dictionaries = []
@@ -14,6 +15,9 @@ var readDictionaries = function(dailyset) {
   console.log("starting extraction")
   recursive(folder, function(err, files) {
     numberOfFiles = files.length
+    finished = _.after(numberOfFiles, () => {fs.deleteFile(Meteor.settings.storedir + '/elasticsearch.lock', () => {
+      console.log('all extractions finished')
+    })
     files.forEach(function (file) {
       fs.readFile(file, 'utf8', function (err, data) {
           dictionaryQuery(JSON.parse(data), dailyset, client)
