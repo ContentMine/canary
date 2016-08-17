@@ -161,7 +161,7 @@ var bulkload = function(records,route,create) {
 var dump = function() {
 	var date = new Date();
 	var outfile = Meteor.settings.userdir+'/'+'dump-'+date.toISOString()+'.json'
-	elasticdump.elasticdump('http://'+Meteor.settings.elastichosts[0]+':'+Meteor.settings.elasticport, outfile)
+	elasticdump.elasticdump('http://'+Meteor.settings.elastichosts[0]+':'+Meteor.settings.elasticport, outfile, {})
 }
 
 module.exports.indexMetadata = indexMetadata
