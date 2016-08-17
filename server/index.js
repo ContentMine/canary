@@ -5,6 +5,7 @@ var path=require('path')
 import * as fs from 'fs'
 import {XMLHttpRequest as xmhtrq} from 'xmlhttprequest';
 var AgentKeepAlive = require('agentkeepalive');
+elasticdump = require('elasticdump')
 
 
 // =====================================================================================
@@ -157,7 +158,14 @@ var bulkload = function(records,route,create) {
 	console.log(records.length + ' records sent to ' + route);
 }
 
+var dump = function() {
+	var date = new Date();
+	var outfile = Meteor.settings.userdir+'/'+'dump-'+date.toISOString()+'.json'
+	elasticdump('http://'+Meteor.settings.elastichosts[0]+':'+Meteor.settings.elasticport, outfile)
+}
+
 module.exports.indexMetadata = indexMetadata
 module.exports.bulkload = bulkload
 module.exports.loadEuPMCFullTexts = loadEuPMCFullTexts
 module.exports.ESClient = ESClient
+module.exports.dump = dump
