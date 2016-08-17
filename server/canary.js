@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import exec from 'child_process';
 import {XMLHttpRequest as xmhtrq} from 'xmlhttprequest';
 var cron = require ('./cron.js')
+var index = require('./index.js')
 
 // ========================================================================================
 // SOME SIMPLE CONVENIENCE FUNCTIONS
