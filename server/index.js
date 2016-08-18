@@ -187,6 +187,7 @@ var dump = function() {
 	var date = new Date();
 	var outfile = Meteor.settings.userdir+'/'+'dump-'+date.toISOString()+'.json'
 	var ed = new elasticdump.elasticdump('http://'+Meteor.settings.elastichosts[0]+':'+Meteor.settings.elasticport, outfile, defaultEDOptions)
+	ed.dump()
 }
 
 module.exports.indexMetadata = indexMetadata
