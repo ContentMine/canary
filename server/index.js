@@ -166,7 +166,7 @@ var defaultEDOptions = {
   delete:          false,
   maxSockets:      null,
   input:           'http://'+Meteor.settings.elastichosts[0]+':'+Meteor.settings.elasticport,
-  'input-index':   null,
+  'input-index':   '_all',
   output:          Meteor.settings.userdir+'/'+'dump-'+new Date().toISOString()+'.json',
   'output-index':  null,
   inputTransport:  null,
