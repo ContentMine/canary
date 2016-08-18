@@ -187,9 +187,9 @@ var dump = function() {
 	var date = new Date();
 	var outfile = Meteor.settings.userdir+'/'+'dump-'+date.toISOString()+'.json'
 	var ed = new elasticdump.elasticdump('http://'+Meteor.settings.elastichosts[0]+':'+Meteor.settings.elasticport+'/_all', outfile, defaultEDOptions)
-	dumper.on('log',   function(message){ console.log('log' + message); });
-	dumper.on('debug', function(message){ console.log();('debug' + message); });
-	dumper.on('error', function(error){   console.log('error' + 'Error Emitted => ' + ( error.message || JSON.stringify(error)) ); });
+	ed.on('log',   function(message){ console.log('log' + message); });
+	ed.on('debug', function(message){ console.log();('debug' + message); });
+	ed.on('error', function(error){   console.log('error' + 'Error Emitted => ' + ( error.message || JSON.stringify(error)) ); });
 	ed.dump()
 
 }
