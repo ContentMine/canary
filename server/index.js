@@ -158,10 +158,35 @@ var bulkload = function(records,route,create) {
 	console.log(records.length + ' records sent to ' + route);
 }
 
+var defaultEDOptions = {
+  limit:           100,
+  offset:          0,
+  debug:           false,
+  type:            'data',
+  delete:          false,
+  maxSockets:      null,
+  input:           null,
+  'input-index':   null,
+  output:          null,
+  'output-index':  null,
+  inputTransport:  null,
+  outputTransport: null,
+  searchBody:      null,
+  sourceOnly:      false,
+  jsonLines:       false,
+  format:          '',
+  'ignore-errors': false,
+  scrollTime:      '10m',
+  timeout:         null,
+  toLog:           null,
+  awsAccessKeyId:    null,
+  awsSecretAccessKey:null,
+}
+
 var dump = function() {
 	var date = new Date();
 	var outfile = Meteor.settings.userdir+'/'+'dump-'+date.toISOString()+'.json'
-	var ed = new elasticdump.elasticdump('http://'+Meteor.settings.elastichosts[0]+':'+Meteor.settings.elasticport, outfile, {})
+	var ed = new elasticdump.elasticdump('http://'+Meteor.settings.elastichosts[0]+':'+Meteor.settings.elasticport, outfile, defaultEDOptions)
 }
 
 module.exports.indexMetadata = indexMetadata
