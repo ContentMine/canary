@@ -93,7 +93,7 @@ var deleteFactIndex = function(err, cb) {
 var mapFactIndex = function(err, cb) {
 	if (err) throw err
 	var client = ESClient()
-	client.indices.putMapping({
+	client.indices.create({
 	"mappings":{
 		"snippet":{
 			"properties":{
