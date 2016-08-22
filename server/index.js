@@ -91,7 +91,7 @@ var deleteFactIndex = function(err, cb) {
 }
 
 var mapFactIndex = function(err, cb) {
-	if (!(err.status==404) && (err)){
+	if ((err) && !(err.status==404)){
 		console.log(err)
 		throw err
 	}
