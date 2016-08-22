@@ -91,7 +91,10 @@ var deleteFactIndex = function(err, cb) {
 }
 
 var mapFactIndex = function(err, cb) {
-	if (!(err.code=='index_not_found_exception') && (err)) throw err
+	if (!(err.code=='index_not_found_exception') && (err)){
+		console.log(err)
+		throw err
+	}
 	var client = ESClient()
 	client.indices.create({
 	"mappings":{
