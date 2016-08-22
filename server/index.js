@@ -110,7 +110,7 @@ var mapFactIndex = function(err, cb) {
 				"term":{"type":"string"}
 			}
 		}
-	}
+	},
 	index: "facts"
 }, cb)
 }
