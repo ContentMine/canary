@@ -69,3 +69,8 @@ API.addRoute('dump', {
 		return {}
 	}
 })
+API.addRoute('facts', {
+	delete: function() {
+		index.deleteAndMapFactIndex()
+	}
+})

@@ -82,6 +82,52 @@ var indexEuPMCMetadata = function(folder) {
 	})
 }
 
+var deleteFactIndex = function(err, cb) {
+	if (err) throw err
+	var client = ESClient()
+	client.indices.delete({
+		index: 'facts'
+	}, cb)
+}
+
+var mapFactIndex = function(err, cb) {
+	if (err) throw err
+	var client = ESClient()
+	client.indices.putMapping({
+	"mappings":{
+		"snippet":{
+			"properties":{
+				"cprojectID":{"type":"string"},
+				"documentID":{"type":"string"},
+				"identifiers":{
+					"properties":{
+						"contentmine":{"type":"string"},
+						"opentrials":{"type":"string"}
+					}
+				},
+				"post":{"type":"string"},
+				"prefix":{"type":"string"},
+				"term":{"type":"string"}
+			}
+		}
+	}
+	index: "facts"
+}, cb)
+}
+
+var deleteAndMapFactIndex = function(err, cb) {
+	if (err) throw err
+	deleteFactIndex(undefined,mapFactIndex)
+}
+
+var deleteMetadataIndex = function(err, cb) {
+
+}
+
+var mapMetadataIndex = function(err, cb) {
+
+}
+
 var indexMetadata = function(dailyset) {
 	indexEuPMCMetadata(Meteor.settings.storedir + '/' + dailyset)
   // for every metadata record, use the folder name (the URL uid) as the _id for the record
