@@ -245,3 +245,4 @@ module.exports.bulkload = bulkload
 module.exports.loadEuPMCFullTexts = loadEuPMCFullTexts
 module.exports.ESClient = ESClient
 module.exports.dump = dump
+module.exports.deleteAndMapFactIndex = deleteAndMapFactIndex
