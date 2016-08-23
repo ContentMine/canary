@@ -142,7 +142,7 @@ var mapMetadataIndex = function(err, cb) {
 		throw err
 	}
 	var client = ESClient()
-	metadataMapping = JSON.parse(fs.readFileSync('./metadataMap.json', 'utf8'))
+	metadataMapping = JSON.parse(fs.readFileSync('metadataMap.json', 'utf8'))
 	client.indices.create({
 		index: "facts",
 		mapping: metadataMapping
