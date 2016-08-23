@@ -75,3 +75,9 @@ API.addRoute('facts', {
 		return {}
 	}
 })
+API.addRoute('metadata', {
+	delete: function() {
+		index.deleteAndMapMetadataIndex()
+		return {}
+	}
+})

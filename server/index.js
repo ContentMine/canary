@@ -123,12 +123,31 @@ var deleteAndMapFactIndex = function(err, cb) {
 	deleteFactIndex(undefined,mapFactIndex)
 }
 
-var deleteMetadataIndex = function(err, cb) {
+var deleteAndMapMetadataIndex = function(err,cb) {
+	if (err) throw err
+	deleteMetadataIndex(undefined, mapMetadataIndex)
+}
 
+var deleteMetadataIndex = function(err, cb) {
+	if (err) throw err
+	var client = ESClient()
+	client.indices.delete({
+		index: 'metadata'
+	}, cb)
 }
 
 var mapMetadataIndex = function(err, cb) {
-
+	if ((err) && !(err.status==404)){
+		console.log(err)
+		throw err
+	}
+	var client = ESClient()
+	metadataMapping = JSON.parse(fs.readFileSync('./metadataMap.json', 'utf8'))
+	client.indices.create({
+		index: "facts",
+		mapping: metadataMapping
+	}
+, cb)
 }
 
 var indexMetadata = function(dailyset) {
@@ -249,3 +268,4 @@ module.exports.loadEuPMCFullTexts = loadEuPMCFullTexts
 module.exports.ESClient = ESClient
 module.exports.dump = dump
 module.exports.deleteAndMapFactIndex = deleteAndMapFactIndex
+module.exports.deleteAndMapMetadataIndex = deleteAndMapMetadataIndex
