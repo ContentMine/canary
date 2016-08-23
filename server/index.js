@@ -133,7 +133,7 @@ var deleteMetadataIndex = function(err, cb) {
 	var client = ESClient()
 	client.indices.delete({
 		index: 'metadata'
-	}, cb)
+	}, Meteor.bindEnvironment(cb))
 }
 
 var mapMetadataIndex = function(err, cb) {
