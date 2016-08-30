@@ -2,7 +2,7 @@ var recursive=require('recursive-readdir')
 var elasticsearch = require('elasticsearch');
 import * as _ from 'lodash'
 var path=require('path')
-import * as fs from 'fs'
+import * as fs from 'graceful-fs'
 import {XMLHttpRequest as xmhtrq} from 'xmlhttprequest';
 var AgentKeepAlive = require('agentkeepalive');
 elasticdump = require('elasticdump')

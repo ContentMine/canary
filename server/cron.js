@@ -1,4 +1,4 @@
-import * as fs from 'fs'
+import * as fs from 'graceful-fs'
 var retrieve = require('./retrieve.js')
 var index = require('./index.js')
 var recursive=require('recursive-readdir')

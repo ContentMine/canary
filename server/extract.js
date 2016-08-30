@@ -1,4 +1,4 @@
-var fs = require('fs')
+var fs = require('graceful-fs')
 var index = require('./index.js')
 var recursive=require('recursive-readdir')
 var Entities = require('html-entities').XmlEntities;
