@@ -37,6 +37,7 @@ var uploadJSONFileToES =  function(file, index, type, client, cprojectID) {
 
 var uploadXMLFileToES = function(file, index, type, client, cprojectID, cb) {
 	fs.readFile(file, function (err, data) {
+		if (err) throw err
 		client.create({
 			index: index,
 			type: type,
