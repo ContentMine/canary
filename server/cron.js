@@ -160,3 +160,4 @@ if (Meteor.settings.runcron) SyncedCron.start();
 module.exports.etl = etl
 module.exports.extract = extractNew
 module.exports.loadCRMDAndFT = loadCRMDAndFT
+module.exports.loadEuPMCMDAndFT = loadEuPMCMDAndFT
