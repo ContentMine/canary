@@ -87,3 +87,9 @@ API.addRoute('load/cr/:set', {
 		return {}
 	}
 })
+API.addRoute('load/eupmc/:set', {
+	get: function() {
+		cron.loadEuPMCMDAndFT(this.urlParams.set)
+		return {}
+	}
+})
