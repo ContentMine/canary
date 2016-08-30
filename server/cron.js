@@ -28,11 +28,22 @@ var etl = function(dailyset) {
     }
 	}
   */
+ loadEuPMCMDAndFT(dailyset)
+};
+
+var loadEuPMCMDAndFT = function (dailyset) {
   index.indexMetadata(dailyset)
   emptyFulltext(function () {
     index.loadEuPMCFullTexts(Meteor.settings.storedir + '/' + dailyset, function() {extractNew(dailyset)})
   }) // chained to ensure index creation happens in the right order
-};
+}
+
+var loadCRMDAndFT = function (setname) {
+  index.indexCRMetadata(setname)
+  emptyFulltext(function () {
+    index.loadCRFullTexts(Meteor.settings.storedir + '/' + setname, function() {extractNew(setname)})
+  })
+}
 
 var createUnstructuredIndex = function (callback) {
   var client = index.ESClient()
@@ -148,3 +159,4 @@ if (Meteor.settings.runcron) SyncedCron.start();
 
 module.exports.etl = etl
 module.exports.extract = extractNew
+module.exports.loadCRMDAndFT = loadCRMDAndFT

@@ -69,6 +69,26 @@ var loadEuPMCFullTexts = function(folder, cb) {
 	})
 }
 
+var loadCRHTMLFullTexts = function(folder, cb) {
+	var client = ESClient()
+	console.log("reading fulltexts from disk")
+	recursive(folder, function(err, files) {
+		var done = _.after(files.length, function() { cb()
+			console.log("done all loading of files")
+		})
+		files.forEach(function (file) {
+			if(path.basename(file)=="fulltext.html") {
+				var cprojectID = path.basename(path.dirname(file))
+				//console.log("uploading fulltext from CProject: " + cprojectID)
+				uploadXMLFileToES(file, 'fulltext', 'unstructured', client, cprojectID, done)
+			}
+			else {
+				done()
+			}
+		})
+	})
+}
+
 var indexEuPMCMetadata = function(folder) {
 	var client = ESClient()
 	console.log(folder)
@@ -78,6 +98,20 @@ var indexEuPMCMetadata = function(folder) {
 				cprojectID = path.basename(path.dirname(file))
 				//console.log("Uploading file with cprojectID: " + cprojectID)
 	    	uploadJSONFileToES(file, 'metadata', 'eupmc', client, cprojectID)
+	    }
+	  })
+	})
+}
+
+var indexCRMetadata = function(folder) {
+	var client = ESClient()
+	console.log(folder)
+	recursive(folder, function(err, files) {
+		files.forEach(function (file) {
+	    if(path.basename(file)=="crossref_result.json") {
+				cprojectID = path.basename(path.dirname(file))
+				//console.log("Uploading file with cprojectID: " + cprojectID)
+	    	uploadJSONFileToES(file, 'metadata', 'crossref', client, cprojectID)
 	    }
 	  })
 	})
@@ -270,3 +304,5 @@ module.exports.ESClient = ESClient
 module.exports.dump = dump
 module.exports.deleteAndMapFactIndex = deleteAndMapFactIndex
 module.exports.deleteAndMapMetadataIndex = deleteAndMapMetadataIndex
+module.exports.indexCRMetadata = indexCRMetadata
+module.exports.loadCRHTMLFullTexts = loadCRHTMLFullTexts

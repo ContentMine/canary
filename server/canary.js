@@ -81,3 +81,9 @@ API.addRoute('metadata', {
 		return {}
 	}
 })
+API.addRoute('load/cr/:set', {
+	get: function() {
+		cron.loadCRMDAndFT(this.urlParams.set)
+		return {}
+	}
+})
