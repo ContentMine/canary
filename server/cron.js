@@ -32,7 +32,7 @@ var etl = function(dailyset) {
 };
 
 var loadEuPMCMDAndFT = function (dailyset) {
-  index.indexMetadata(dailyset)
+  index.indexEuPMCMetadata(dailyset)
   emptyFulltext(function () {
     index.loadEuPMCFullTexts(Meteor.settings.storedir + '/' + dailyset, function() {extractNew(dailyset)})
   }) // chained to ensure index creation happens in the right order
