@@ -305,4 +305,5 @@ module.exports.dump = dump
 module.exports.deleteAndMapFactIndex = deleteAndMapFactIndex
 module.exports.deleteAndMapMetadataIndex = deleteAndMapMetadataIndex
 module.exports.indexCRMetadata = indexCRMetadata
+module.exports.indexEuPMCMetadata = indexEuPMCMetadata
 module.exports.loadCRHTMLFullTexts = loadCRHTMLFullTexts
