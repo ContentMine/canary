@@ -32,14 +32,14 @@ var etl = function(dailyset) {
 };
 
 var loadEuPMCMDAndFT = function (dailyset) {
-  index.indexEuPMCMetadata(dailyset)
+  index.indexEuPMCMetadata(Meteor.settings.storedir + '/' + dailyset)
   emptyFulltext(function () {
     index.loadEuPMCFullTexts(Meteor.settings.storedir + '/' + dailyset, function() {extractNew(dailyset)})
   }) // chained to ensure index creation happens in the right order
 }
 
 var loadCRMDAndFT = function (setname) {
-  index.indexCRMetadata(setname)
+  index.indexCRMetadata(Meteor.settings.storedir + '/' + setname)
   emptyFulltext(function () {
     index.loadCRFullTexts(Meteor.settings.storedir + '/' + setname, function() {extractNew(setname)})
   })
