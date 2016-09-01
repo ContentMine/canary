@@ -41,7 +41,7 @@ var loadEuPMCMDAndFT = function (dailyset) {
 var loadCRMDAndFT = function (setname) {
   index.indexCRMetadata(Meteor.settings.storedir + '/' + setname)
   emptyFulltext(function () {
-    index.loadCRFullTexts(Meteor.settings.storedir + '/' + setname, function() {extractNew(setname)})
+    index.loadCRHTMLFullTexts(Meteor.settings.storedir + '/' + setname, function() {extractNew(setname)})
   })
 }
 
