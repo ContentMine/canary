@@ -320,3 +320,5 @@ module.exports.deleteAndMapMetadataIndex = deleteAndMapMetadataIndex
 module.exports.indexCRMetadata = indexCRMetadata
 module.exports.indexEuPMCMetadata = indexEuPMCMetadata
 module.exports.loadCRHTMLFullTexts = loadCRHTMLFullTexts
+module.exports.loadCRXHTMLFullTexts = loadCRXHTMLFullTexts
+module.exports.loadCRPDFFullTexts = loadCRPDFFullTexts

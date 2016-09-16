@@ -38,10 +38,10 @@ var loadEuPMCMDAndFT = function (dailyset) {
   }) // chained to ensure index creation happens in the right order
 }
 
-var loadCRMDAndFT = function (setname) {
+var loadCRMDAndFT = function (setname, type) {
   index.indexCRMetadata(Meteor.settings.storedir + '/' + setname)
   emptyFulltext(function () {
-    index.loadCRHTMLFullTexts(Meteor.settings.storedir + '/' + setname, function() {extractNew(setname)})
+    index.loadCRFullTexts(Meteor.settings.storedir + '/' + setname, 'fulltext.'+type, function() {extractNew(setname)})
   })
 }
 
