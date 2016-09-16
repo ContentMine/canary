@@ -69,7 +69,20 @@ var loadEuPMCFullTexts = function(folder, cb) {
 	})
 }
 
-var loadCRHTMLFullTexts = function(folder, cb) {
+var loadCRHTMLFullTexts = function (folder, cb) {
+	loadCRFullTexts(folder, 'fulltext.html', cb)
+}
+
+var loadCRXHTMLFullTexts = function (folder, cb) {
+	loadCRFullTexts(folder, 'fulltext.xhtml', cb)
+}
+
+var loadCRPDFFullTexts = function (folder, cb) {
+	loadCRFullTexts(folder, 'fulltext.pdf.txt', cb)
+}
+
+var loadCRFullTexts = function(folder, filename, cb) {
+	filename = filename || 'fulltext.html'
 	var client = ESClient()
 	console.log("reading fulltexts from disk")
 	recursive(folder, function(err, files) {
@@ -77,7 +90,7 @@ var loadCRHTMLFullTexts = function(folder, cb) {
 			console.log("done all loading of files")
 		})
 		files.forEach(function (file) {
-			if(path.basename(file)=="fulltext.html") {
+			if(path.basename(file)==filename) {
 				var cprojectID = path.basename(path.dirname(file))
 				//console.log("uploading fulltext from CProject: " + cprojectID)
 				uploadXMLFileToES(file, 'fulltext', 'unstructured', client, cprojectID, done)
