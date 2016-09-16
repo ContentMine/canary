@@ -322,3 +322,4 @@ module.exports.indexEuPMCMetadata = indexEuPMCMetadata
 module.exports.loadCRHTMLFullTexts = loadCRHTMLFullTexts
 module.exports.loadCRXHTMLFullTexts = loadCRXHTMLFullTexts
 module.exports.loadCRPDFFullTexts = loadCRPDFFullTexts
+module.exports.loadCRFullTexts = loadCRFullTexts
