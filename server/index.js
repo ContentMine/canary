@@ -23,7 +23,13 @@ var ESClient = function () {
 	return client
 }
 
-var uploadJSONFileToES =  function(file, index, type, client, cprojectID) {
+var errorPrintingCB = function (error) {
+	if (error) {
+		console.log(error)
+	}
+}
+
+var uploadJSONFileToES =  function(file, index, type, client, cprojectID, cb) {
 	fs.readFile(file, function (err, data) {
 		document = JSON.parse(data)
 		document.cprojectID = cprojectID
@@ -31,7 +37,7 @@ var uploadJSONFileToES =  function(file, index, type, client, cprojectID) {
 			index: index,
 			type: type,
 			body: document
-		})
+		}, cb)
 	})
 }
 
@@ -110,7 +116,7 @@ var indexEuPMCMetadata = function(folder) {
 	    if(path.basename(file)=="eupmc_result.json") {
 				cprojectID = path.basename(path.dirname(file))
 				//console.log("Uploading file with cprojectID: " + cprojectID)
-	    	uploadJSONFileToES(file, 'metadata', 'eupmc', client, cprojectID)
+	    	uploadJSONFileToES(file, 'metadata', 'eupmc', client, cprojectID, errorPrintingCB)
 	    }
 	  })
 	})
@@ -124,7 +130,7 @@ var indexCRMetadata = function(folder) {
 	    if(path.basename(file)=="crossref_result.json") {
 				cprojectID = path.basename(path.dirname(file))
 				//console.log("Uploading file with cprojectID: " + cprojectID)
-	    	uploadJSONFileToES(file, 'metadata', 'crossref', client, cprojectID)
+	    	uploadJSONFileToES(file, 'metadata', 'crossref', client, cprojectID, errorPrintingCB)
 	    }
 	  })
 	})
