@@ -16,6 +16,7 @@ var ESClient = function () {
 	var client = new elasticsearch.Client({
 		hosts: Meteor.settings.elastichosts,
 		maxSockets: 20,
+		maxRetries: 50,
     createNodeAgent(connection, config) {
 	    return new AgentKeepAlive(connection.makeAgentConfig(config));
     }
