@@ -1,9 +1,12 @@
 {
-  "runcron": true,
+  "runcron": false,
   "normalise": false,
-  "indexurl": "http://gateway:9200",
-  "userdir": "/home/cloo",
-  "storedir": "/home/cloo/store",
-  "dictsdir": "/home/cloo/dev/contentmine/src/dictionaries",
-  "scraperdir": "/home/cloo/dev/contentmine/src/journal-scrapers/scrapers/"
+  "indexurl": "http://localhost:9200",
+  "elastichost": "localhost",
+  "elasticport": "9200",
+  "userdir": "/home/tom/src/contentmine/canaryvm",
+  "storedir": "/home/tom/src/contentmine/canaryvm/store",
+  "dictsdir": "/home/tom/src/contentmine/canaryvm/dictionaries",
+  "scraperdir": "/home/tom/src/contentmine/canaryvm/scrapers/",
+  "downloadPapers": false
 }

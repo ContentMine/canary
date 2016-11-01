@@ -1,68 +1,13 @@
 
-import * as fs from 'fs';
+import * as fs from 'graceful-fs';
 import exec from 'child_process';
 import {XMLHttpRequest as xmhtrq} from 'xmlhttprequest';
-
-
-
-
-
-
+var cron = require ('./cron.js')
+var index = require('./index.js')
 
 // ========================================================================================
 // SOME SIMPLE CONVENIENCE FUNCTIONS
-var uid = function(url) {
-	return url.replace(/\/+/g, '_').replace(/:/g, '');
-};
-
-var uuid = function() {
-	return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-		var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-		return v.toString(16);
-	});
-};
-
-if (typeof String.prototype.endsWith !== 'function') {
-	String.prototype.endsWith = function(suffix) {
-		return this.indexOf(suffix, this.length - suffix.length) !== -1;
-	};
-}
-if (typeof String.prototype.startsWith !== 'function') {
-	String.prototype.startsWith = function(prefix) {
-		return this.indexOf(prefix, 0, this.length - prefix.length) !== -1;
-	};
-}
-
-var dated = function( delim, less ) {
-	if ( delim === undefined ) delim = '';
-	if ( less === undefined ) less = 5;
-	var date = new Date();
-	if ( less ) date.setDate(date.getDate() - less);
-	var dd = date.getDate();
-	var mm = date.getMonth()+1;
-	var yyyy = date.getFullYear();
-	if ( dd<10 ) dd = '0'+dd;
-	if ( mm<10 ) mm = '0'+mm;
-	return yyyy + delim + mm + delim + dd;
-};
-var todayset = function() {
-	return 'daily' + dated();
-};
-
-var eexec = function(cmd, callback) {
-	console.log('async exec ' + cmd);
-	var child = exec(cmd, function(err, out, code) { 
-		console.log(err);
-		console.log(out);
-		console.log(code);
-		callback(null, out); 
-	});
-};
-var aexec = Async.wrap(eexec);
-
-
-
-
+// Now in markscommon.js
 // ========================================================================================
 // THE API ENDPOINTS, THAT CALL THE OTHER FUNCTIONS
 API = new Restivus({
@@ -76,7 +21,7 @@ API.addRoute('', {
 API.addRoute('etl/:dailyset', {
 	// dailyset form should be like 2016-06-01
 	post: function() {
-		etl(this.urlParams.dailyset);
+		cron.etl(this.urlParams.dailyset);
 		return '';
 	}
 });
@@ -85,12 +30,13 @@ API.addRoute('etl/:dailyset', {
 API.addRoute('retrieve', {
 	get: function() {
 		return {}; // TODO given a URL as query param, retrieve the content of the URL into the system somehow... could also accept data on POST
-		// if we do this, then the items content should be saved into a folder in the store named with some uuid, then can be extracted into an 
+		// if we do this, then the items content should be saved into a folder in the store named with some uuid, then can be extracted into an
 		// index with that uuid too, then facts could be retrieved from it
 	}
 });
 API.addRoute('extract', {
 	get: function() {
+		cron.extract(this.urlParams.dailyset)
 		return {}; // TODO extract the content of a given source - accept a dicts param to list which dicts to run, and a query param to identify the catalogue items to run it against
 	}
 });
@@ -117,6 +63,33 @@ API.addRoute('store', {
 		// this could probably also just be served by nginx configuration
 	}
 });
-
-
-
+API.addRoute('dump', {
+	get: function () {
+		index.dump()
+		return {}
+	}
+})
+API.addRoute('facts', {
+	delete: function() {
+		index.deleteAndMapFactIndex()
+		return {}
+	}
+})
+API.addRoute('metadata', {
+	delete: function() {
+		index.deleteAndMapMetadataIndex()
+		return {}
+	}
+})
+API.addRoute('load/cr/:set/:type', {
+	get: function() {
+		cron.loadCRMDAndFT(this.urlParams.set, this.urlParams.type)
+		return {}
+	}
+})
+API.addRoute('load/eupmc/:set', {
+	get: function() {
+		cron.loadEuPMCMDAndFT(this.urlParams.set)
+		return {}
+	}
+})

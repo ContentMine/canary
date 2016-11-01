@@ -12,7 +12,7 @@ var setarticledir = function(dailyset,url) { // needed for AMI
 
 // =====================================================================================
 // THE FUNCTIONS BELOW HERE ARE OLD ONES THAT CAN RUN AMI AND TRAVERSE
-// AMI CPROJECT OUTPUT DIRECTORIES FOR RESULTS FILES THAT IT THEN 
+// AMI CPROJECT OUTPUT DIRECTORIES FOR RESULTS FILES THAT IT THEN
 // TRANSLATES AND FORMATS AS BIBJSON
 var process = function(params) {
 	console.log('beginning process ' + params.processor);
@@ -79,7 +79,7 @@ var readFacts = function(sd) {
 };
 
 
-var walk = function(dir, filelist) { 
+var walk = function(dir, filelist) {
 	if( dir[dir.length-1] != '/') dir=dir.concat('/');
 	var files = fs.readdirSync(dir);
 	filelist = filelist || [];
@@ -123,7 +123,6 @@ var translate = function(fn, callback) {
 			//console.log(JSON.stringify(res,undefined,2));
 			return callback(null,res);
 		});
-	});	
+	});
 };
 var atranslate = Async.wrap(translate);
-
