@@ -78,7 +78,7 @@ var geturls = function(sd, api) {
 			}
 		}
 		if ( url === false && ob.DOI ) {
-			url = 'http://dx.doi.org/' + ob.DOI[0];
+			url = 'https://doi.org/' + ob.DOI[0];
 		}
 		if ( url === false && ob.pmcid ) {
 			url = 'http://europepmc.org/articles/PMC' + ob.pmcid[0].replace('PMC','');
